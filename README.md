@@ -29,8 +29,14 @@ E-commerce platform for **Yen Flowers** - a premium flower shop in Ho Chi Minh C
 yenflowers-store/
 ├── src/                    # React frontend
 │   ├── components/ui/      # shadcn/ui components
+│   ├── admin/              # Admin CMS pages & components
+│   │   ├── components/     # Admin layout, sidebar
+│   │   └── pages/          # Dashboard, Products, Orders, etc.
+│   ├── services/           # API client services
+│   ├── types/              # TypeScript type definitions
 │   ├── lib/                # Utilities
-│   └── App.tsx             # Main app
+│   ├── App.tsx             # Main app with routing
+│   └── StoreFront.tsx      # Public store component
 ├── backend/                # Python FastAPI backend
 │   ├── app/
 │   │   ├── routers/        # API routes (admin, public, orders)
@@ -42,6 +48,8 @@ yenflowers-store/
 │   └── requirements.txt
 ├── supabase/
 │   └── migrations/         # Database schema
+├── docs/                   # Documentation
+│   └── FACEBOOK_INTEGRATION.md
 └── IMPLEMENTATION_PLAN.md  # Full project roadmap
 ```
 
@@ -97,9 +105,43 @@ Once the backend is running, visit:
 - [x] Blog posts
 - [x] Admin dashboard APIs
 - [x] Multi-language (VI/EN)
-- [ ] Admin frontend (coming soon)
+- [x] **Admin CMS** - Full-featured admin dashboard
 - [ ] SEO optimization
 - [ ] Email notifications
+
+---
+
+## 🔐 Admin CMS
+
+Access the admin dashboard at `/admin` to manage:
+
+| Module | Features |
+|--------|----------|
+| **Dashboard** | Stats overview, recent orders, quick actions |
+| **Products** | CRUD, filters, search, featured/published toggles |
+| **Categories** | Create, edit, delete, sort order |
+| **Orders** | View, update status, filter by status |
+| **Blog** | Write, edit, publish posts |
+| **Social Feed** | Facebook sync, import posts as products |
+| **Settings** | Store info, delivery fees, payment methods |
+
+---
+
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [LOCAL_SETUP.md](./docs/LOCAL_SETUP.md) | **Start here!** Local development setup |
+| [API_REFERENCE.md](./docs/API_REFERENCE.md) | Complete REST API documentation |
+| [FACEBOOK_INTEGRATION.md](./docs/FACEBOOK_INTEGRATION.md) | Facebook Page sync setup guide |
+| [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) | Full project roadmap and architecture |
+
+### 📮 Postman Collection
+
+Import these files into Postman for API testing:
+
+1. **Collection:** `docs/YenFlowers_API.postman_collection.json`
+2. **Environment:** `docs/YenFlowers_Local.postman_environment.json`
 
 ---
 

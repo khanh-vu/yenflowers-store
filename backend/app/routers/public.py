@@ -12,6 +12,7 @@ from app.schemas.schemas import (
     CategoryResponse,
     ProductResponse,
     BlogPostResponse,
+    SocialFeedResponse,
     PaginatedResponse
 )
 
@@ -220,3 +221,27 @@ async def search(
         page_size=page_size,
         total_pages=(total + page_size - 1) // page_size
     )
+
+
+# =====================================================
+# SOCIAL FEED
+# =====================================================
+@router.get("/social/feed", response_model=list[SocialFeedResponse])
+async def get_social_feed(
+    db: Client = Depends(get_supabase)
+):
+    """Get social feed items (Facebook/Instagram)."""
+    result = db.table("social_feed").select("*").order("posted_at", desc=True).execute()
+    return result.data
+
+
+@router.get("/social/feed/{post_id}", response_model=SocialFeedResponse)
+async def get_social_feed_item(
+    post_id: UUID,
+    db: Client = Depends(get_supabase)
+):
+    """Get a single social feed item by ID."""
+    result = db.table("social_feed").select("*").eq("id", str(post_id)).execute()
+    if not result.data:
+        raise HTTPException(status_code=404, detail="Social feed item not found")
+    return result.data[0]

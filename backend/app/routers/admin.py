@@ -2,7 +2,7 @@
 Admin API routes for managing products, categories, orders, blog, and settings.
 All routes require admin authentication.
 """
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Body
 from uuid import UUID
 from typing import Optional
 from supabase import Client
@@ -13,12 +13,13 @@ from app.schemas.schemas import (
     ProductCreate, ProductUpdate, ProductResponse,
     OrderResponse, OrderStatusUpdate,
     BlogPostCreate, BlogPostUpdate, BlogPostResponse,
-    SocialFeedResponse, ImportAsProductRequest,
+    SocialFeedResponse, ImportAsProductRequest, SocialSyncRequest,
     PaginatedResponse
 )
 from app.services.facebook_sync import get_fb_service
+from app.dependencies import get_current_admin
 
-router = APIRouter(prefix="/admin", tags=["Admin"])
+router = APIRouter(prefix="/admin", tags=["Admin"], dependencies=[Depends(get_current_admin)])
 
 
 # =====================================================
@@ -173,10 +174,20 @@ async def update_product(
     if "images" in update_data and update_data["images"]:
         update_data["images"] = [img.model_dump() if hasattr(img, 'model_dump') else img for img in update_data["images"]]
     
-    result = db.table("products").update(update_data).eq("id", str(product_id)).execute()
-    if not result.data:
-        raise HTTPException(status_code=404, detail="Product not found")
-    return result.data[0]
+    # Convert UUID to string for database
+    if "category_id" in update_data and update_data["category_id"]:
+        update_data["category_id"] = str(update_data["category_id"])
+    
+    try:
+        result = db.table("products").update(update_data).eq("id", str(product_id)).execute()
+        if not result.data:
+            raise HTTPException(status_code=404, detail="Product not found")
+        return result.data[0]
+    except Exception as e:
+        error_msg = str(e)
+        if "foreign key" in error_msg.lower() or "violates" in error_msg.lower():
+            raise HTTPException(status_code=400, detail="Category không tồn tại")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.delete("/products/{product_id}")
@@ -358,37 +369,254 @@ async def delete_blog_post(
 # =====================================================
 @router.post("/social/sync")
 async def sync_facebook(
+    request: SocialSyncRequest = SocialSyncRequest(),
     db: Client = Depends(get_supabase_admin)
 ):
-    """Trigger Facebook sync to fetch latest posts/photos."""
+    """
+    Batch-based Facebook sync.
+    Fetches 25 posts per call and stores cursor to resume.
+    Call repeatedly until has_more=False to sync all posts.
+    """
     fb = get_fb_service()
     
-    # Fetch photos and posts
-    photos = fb.fetch_page_photos(limit=50)
-    posts = fb.fetch_page_posts(limit=50)
-    all_items = photos + posts
+    # Get settings including saved cursor
+    settings_result = db.table("settings").select("value").eq("key", "fb_sync").execute()
+    fb_settings = settings_result.data[0]["value"] if settings_result.data else {}
     
-    if not all_items:
-        return {"message": "No new items found", "synced": 0}
+    # Set credentials from settings
+    db_page_id = fb_settings.get("page_id")
+    db_token = fb_settings.get("access_token")
+    if db_page_id and db_token:
+        fb.set_credentials(db_page_id, db_token)
     
-    # Upsert into social_feed
-    synced_count = 0
-    for item in all_items:
-        # Check if already exists
-        existing = db.table("social_feed").select("id").eq("post_id", item["post_id"]).execute()
-        if existing.data:
-            continue
+    try:
+        days_back = request.days_back
+        min_length = request.min_length or 0
+        batch_size = request.limit or 25  # Default 25 per batch
         
-        db.table("social_feed").insert(item).execute()
-        synced_count += 1
+        # Get saved cursor (None means start from beginning)
+        saved_cursor = fb_settings.get("sync_cursor")
+        
+        # Reset cursor if explicitly requested
+        if request.reset:
+            saved_cursor = None
+        
+        # Fetch ONE batch of posts
+        posts, next_cursor, has_more = fb.fetch_posts_batch(
+            batch_size=batch_size,
+            cursor=saved_cursor,
+            days_back=days_back
+        )
+        
+        # Process and save posts
+        synced_count = 0
+        updated_count = 0
+        
+        for item in posts:
+            caption = item.get("caption") or ""
+            if len(caption) < min_length:
+                continue
+
+            existing = db.table("social_feed").select("id").eq("post_id", item["post_id"]).execute()
+            
+            if existing.data:
+                db.table("social_feed").update({
+                    "image_urls": item.get("image_urls", []),
+                    "post_type": item.get("post_type"),
+                }).eq("post_id", item["post_id"]).execute()
+                updated_count += 1
+            else:
+                db.table("social_feed").insert(item).execute()
+                synced_count += 1
+        
+        # Update settings with new cursor
+        from datetime import datetime
+        new_settings = {
+            **fb_settings,
+            "page_id": fb.page_id,
+            "last_sync": datetime.utcnow().isoformat(),
+            "sync_cursor": next_cursor if has_more else None,  # Clear cursor when done
+            "sync_in_progress": has_more,
+        }
+        
+        settings_payload = {"key": "fb_sync", "value": new_settings}
+        
+        if settings_result.data:
+            db.table("settings").update(settings_payload).eq("key", "fb_sync").execute()
+        else:
+            db.table("settings").insert(settings_payload).execute()
+        
+        # Get total synced count
+        total_result = db.table("social_feed").select("id", count="exact").execute()
+        total_in_db = total_result.count if hasattr(total_result, 'count') else len(total_result.data)
+        
+        return {
+            "message": f"Batch complete: {synced_count} new, {updated_count} updated",
+            "synced": synced_count,
+            "updated": updated_count,
+            "batch_size": len(posts),
+            "has_more": has_more,
+            "total_in_db": total_in_db,
+        }
+        
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Sync failed: {str(e)}")
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Sync failed: {str(e)}")
+
+
+@router.get("/social/sync-status")
+async def get_sync_status(
+    refresh_count: bool = False,
+    db: Client = Depends(get_supabase_admin)
+):
+    """
+    Get current sync status.
+    Set refresh_count=true to fetch real total from Facebook (slower).
+    """
+    fb = get_fb_service()
     
-    # Update last sync time in settings
-    from datetime import datetime
-    db.table("settings").update({
-        "value": {"page_id": fb.page_id, "last_sync": datetime.utcnow().isoformat(), "auto_sync": False}
-    }).eq("key", "fb_sync").execute()
+    # Get settings
+    settings_result = db.table("settings").select("value").eq("key", "fb_sync").execute()
+    fb_settings = settings_result.data[0]["value"] if settings_result.data else {}
     
-    return {"message": f"Synced {synced_count} new items", "synced": synced_count}
+    # Set credentials
+    db_page_id = fb_settings.get("page_id")
+    db_token = fb_settings.get("access_token")
+    if db_page_id and db_token:
+        fb.set_credentials(db_page_id, db_token)
+    
+    # Get total posts in database
+    total_result = db.table("social_feed").select("id", count="exact").execute()
+    total_in_db = total_result.count if hasattr(total_result, 'count') else len(total_result.data)
+    
+    # Get or refresh FB total count
+    fb_total = fb_settings.get("fb_total_posts", 0)
+    
+    if refresh_count and db_page_id and db_token:
+        try:
+            fb_total = fb.get_total_posts_count()
+            # Store updated count
+            fb_settings["fb_total_posts"] = fb_total
+            db.table("settings").update({"value": fb_settings}).eq("key", "fb_sync").execute()
+        except Exception as e:
+            print(f"Failed to get FB count: {e}")
+    
+    sync_cursor = fb_settings.get("sync_cursor")
+    last_sync = fb_settings.get("last_sync")
+    
+    # Calculate progress
+    progress = 0
+    if fb_total > 0:
+        progress = min(100, (total_in_db / fb_total) * 100)
+    
+    return {
+        "fb_total_posts": fb_total,
+        "total_in_db": total_in_db,
+        "has_cursor": sync_cursor is not None,
+        "progress": round(progress, 1),
+        "last_sync": last_sync,
+    }
+
+
+@router.post("/social/sync-all")
+async def sync_all_facebook(
+    db: Client = Depends(get_supabase_admin)
+):
+    """
+    Sync ALL posts from Facebook in one go using internal batching.
+    First fetches total count, then loops through all pages.
+    Returns progress updates.
+    """
+    fb = get_fb_service()
+    
+    # Get settings
+    settings_result = db.table("settings").select("value").eq("key", "fb_sync").execute()
+    fb_settings = settings_result.data[0]["value"] if settings_result.data else {}
+    
+    db_page_id = fb_settings.get("page_id")
+    db_token = fb_settings.get("access_token")
+    if db_page_id and db_token:
+        fb.set_credentials(db_page_id, db_token)
+    
+    try:
+        all_synced = 0
+        all_updated = 0
+        cursor = None
+        batch_num = 0
+        total_fetched = 0
+        
+        # Loop through all pages
+        while True:
+            batch_num += 1
+            posts, next_cursor, has_more = fb.fetch_posts_batch(
+                batch_size=50,  # Larger batch for sync-all
+                cursor=cursor
+            )
+            
+            total_fetched += len(posts)
+            
+            for item in posts:
+                existing = db.table("social_feed").select("id").eq("post_id", item["post_id"]).execute()
+                
+                if existing.data:
+                    db.table("social_feed").update({
+                        "image_urls": item.get("image_urls", []),
+                        "post_type": item.get("post_type"),
+                    }).eq("post_id", item["post_id"]).execute()
+                    all_updated += 1
+                else:
+                    db.table("social_feed").insert(item).execute()
+                    all_synced += 1
+            
+            cursor = next_cursor
+            if not has_more:
+                break
+        
+        # Update settings
+        from datetime import datetime
+        new_settings = {
+            **fb_settings,
+            "page_id": fb.page_id,
+            "last_sync": datetime.utcnow().isoformat(),
+            "sync_cursor": None,
+            "sync_in_progress": False,
+            "fb_total_posts": total_fetched,
+        }
+        
+        db.table("settings").update({"key": "fb_sync", "value": new_settings}).eq("key", "fb_sync").execute()
+        
+        return {
+            "message": f"Synced all: {all_synced} new, {all_updated} updated",
+            "synced": all_synced,
+            "updated": all_updated,
+            "total_fetched": total_fetched,
+            "batches": batch_num,
+        }
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Sync failed: {str(e)}")
+
+
+@router.patch("/social/{feed_id}/pin")
+async def pin_social_post(
+    feed_id: UUID,
+    is_pinned: bool = Body(..., embed=True),
+    db: Client = Depends(get_supabase_admin)
+):
+    """Toggle pin status of a social feed item."""
+    result = db.table("social_feed").update({"is_pinned": is_pinned}).eq("id", str(feed_id)).execute()
+    if not result.data:
+        raise HTTPException(status_code=404, detail="Social feed item not found")
+    return {"message": f"Post {'pinned' if is_pinned else 'unpinned'}", "id": str(feed_id)}
 
 
 @router.get("/social/feed", response_model=PaginatedResponse)
@@ -436,9 +664,34 @@ async def import_as_product(
     
     feed_item = feed.data[0]
     
-    # Create slug from name
+    # Create slug from name - remove Vietnamese accents
     import re
-    slug = re.sub(r'[^a-z0-9]+', '-', data.name_vi.lower()).strip('-')
+    import unicodedata
+    # Normalize and remove Vietnamese diacritics
+    name_normalized = unicodedata.normalize('NFD', data.name_vi)
+    name_ascii = ''.join(c for c in name_normalized if unicodedata.category(c) != 'Mn')
+    name_ascii = name_ascii.replace('đ', 'd').replace('Đ', 'D')
+    slug = re.sub(r'[^a-z0-9]+', '-', name_ascii.lower()).strip('-')
+    
+    # Get all images from feed item (images array or fallback to image_url)
+    feed_images = feed_item.get("image_urls") or []
+    if not feed_images and feed_item.get("image_url"):
+        feed_images = [{"url": feed_item["image_url"]}]
+    
+    # Create product images array with all feed images
+    product_images = []
+    for i, img in enumerate(feed_images):
+        if isinstance(img, dict):
+            url = img.get("url")
+        else:
+            url = img
+            
+        if url:
+            product_images.append({
+                "url": url, 
+                "alt": data.name_vi, 
+                "sort_order": i
+            })
     
     # Create product
     product_data = {
@@ -447,7 +700,7 @@ async def import_as_product(
         "name_en": data.name_en,
         "price": data.price,
         "category_id": str(data.category_id) if data.category_id else None,
-        "images": [{"url": feed_item["image_url"], "alt": data.name_vi, "sort_order": 0}],
+        "images": product_images,
         "description_vi": feed_item.get("caption"),
         "fb_post_id": feed_item["post_id"],
         "is_published": False  # Draft by default
@@ -486,7 +739,11 @@ async def update_setting(
     db: Client = Depends(get_supabase_admin)
 ):
     """Update a specific setting."""
+    # Try to update
     result = db.table("settings").update({"value": value}).eq("key", key).execute()
+    
+    # If not found (no data returned), insert new
     if not result.data:
-        raise HTTPException(status_code=404, detail="Setting not found")
+        result = db.table("settings").insert({"key": key, "value": value}).execute()
+        
     return result.data[0]
