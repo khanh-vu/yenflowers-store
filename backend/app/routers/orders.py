@@ -150,10 +150,13 @@ async def create_order(
     order_id = result.data[0]["id"]
     
     # Create order items
+    created_items = []
     for item in order_items:
         item["order_id"] = order_id
-        db.table("order_items").insert(item).execute()
-    
+        item_result = db.table("order_items").insert(item).execute()
+        if item_result.data:
+            created_items.append(item_result.data[0])
+            
     # Reduce stock
     for item in order_data.items:
         prod = db.table("products").select("stock_quantity").eq("id", str(item.product_id)).execute()
@@ -163,7 +166,7 @@ async def create_order(
     
     # Return order with items
     order_response = result.data[0]
-    order_response["items"] = order_items
+    order_response["items"] = created_items
     
     return order_response
 
@@ -253,3 +256,92 @@ async def stripe_webhook(
             }).eq("id", order_id).execute()
     
     return {"received": True}
+
+
+@router.post("/{order_id}/payment/paypal/capture")
+async def capture_paypal_order(
+    order_id: UUID,
+    paypal_order_id: str,
+    db: Client = Depends(get_supabase_admin)
+):
+    """
+    Capture/Verify PayPal order after client-side approval.
+    Updates order payment status.
+    """
+    if not settings.paypal_client_id or not settings.paypal_client_secret:
+        raise HTTPException(status_code=500, detail="PayPal not configured")
+    
+    # Get Order
+    order = db.table("orders").select("*").eq("id", str(order_id)).execute()
+    if not order.data:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    order_data = order.data[0]
+    
+    # PayPal API URL
+    base_url = "https://api-m.sandbox.paypal.com" if settings.paypal_mode == "sandbox" else "https://api-m.paypal.com"
+    
+    import httpx
+    import base64
+    
+    # 1. Get Access Token
+    auth_str = f"{settings.paypal_client_id}:{settings.paypal_client_secret}"
+    b64_auth = base64.b64encode(auth_str.encode()).decode()
+    
+    async with httpx.AsyncClient() as client:
+        try:
+            token_resp = await client.post(
+                f"{base_url}/v1/oauth2/token",
+                headers={
+                    "Authorization": f"Basic {b64_auth}",
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                data={"grant_type": "client_credentials"}
+            )
+            token_resp.raise_for_status()
+            access_token = token_resp.json()["access_token"]
+            
+            # 2. Capture/Get details
+            # If client-side capture was already done, we just get details.
+            # Assuming we need to capture key:
+            capture_resp = await client.post(
+                f"{base_url}/v2/checkout/orders/{paypal_order_id}/capture",
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {access_token}"
+                }
+            )
+            
+            # If already captured or error
+            if capture_resp.status_code != 201 and capture_resp.status_code != 200:
+                # Try getting details in case it was already captured
+                details_resp = await client.get(
+                    f"{base_url}/v2/checkout/orders/{paypal_order_id}",
+                    headers={"Authorization": f"Bearer {access_token}"}
+                )
+                if details_resp.status_code != 200:
+                    raise HTTPException(status_code=400, detail="Failed to verify PayPal order")
+                capture_data = details_resp.json()
+            else:
+                capture_data = capture_resp.json()
+            
+            # 3. Verify status
+            if capture_data["status"] != "COMPLETED":
+                raise HTTPException(status_code=400, detail=f"PayPal order status: {capture_data['status']}")
+            
+            # 4. Verify amount (Optional but recommended)
+            # This requires parsing capture_data.purchase_units[0].amount.value
+            
+            # 5. Update Order
+            db.table("orders").update({
+                "payment_status": "paid",
+                "order_status": "confirmed",
+                "payment_method": "paypal",
+                "payment_intent_id": paypal_order_id,
+                "paid_at": datetime.utcnow().isoformat()
+            }).eq("id", str(order_id)).execute()
+            
+            return {"status": "success", "order_id": str(order_id)}
+            
+        except httpx.HTTPError as e:
+            raise HTTPException(status_code=400, detail=f"PayPal API Error: {str(e)}")

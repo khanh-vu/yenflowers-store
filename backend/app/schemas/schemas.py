@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 from datetime import datetime
 from uuid import UUID
@@ -99,6 +99,13 @@ class ProductUpdate(BaseModel):
     is_published: Optional[bool] = None
     seo_title: Optional[str] = None
     seo_description: Optional[str] = None
+    
+    @field_validator('price', 'sale_price', 'cost_price', mode='before')
+    @classmethod
+    def coerce_price(cls, v):
+        if v is None:
+            return None
+        return int(v) if isinstance(v, str) else v
 
 
 class ProductResponse(ProductBase):
@@ -128,7 +135,7 @@ class ShippingAddress(BaseModel):
 class OrderItemCreate(BaseModel):
     product_id: UUID
     variant_id: Optional[UUID] = None
-    quantity: int = 1
+    quantity: int = Field(default=1, gt=0)
 
 
 class OrderCreate(BaseModel):
@@ -238,12 +245,14 @@ class SocialFeedResponse(BaseModel):
     post_id: str
     caption: Optional[str]
     image_url: Optional[str]
+    image_urls: list[str] = []
     permalink: Optional[str]
     post_type: Optional[str]
     posted_at: Optional[datetime]
     synced_at: datetime
     is_imported_as_product: bool
     imported_product_id: Optional[UUID]
+    is_pinned: bool = False
 
     class Config:
         from_attributes = True
@@ -254,6 +263,14 @@ class ImportAsProductRequest(BaseModel):
     name_en: Optional[str] = None
     price: int
     category_id: Optional[UUID] = None
+
+
+class SocialSyncRequest(BaseModel):
+    days_back: Optional[int] = Field(None, description="Sync content from the last N days")
+    limit: Optional[int] = Field(25, description="Batch size - posts to fetch per call")
+    min_length: Optional[int] = Field(None, description="Minimum caption length to sync")
+    reset: Optional[bool] = Field(False, description="Reset cursor and start from beginning")
+
 
 
 # =====================================================
