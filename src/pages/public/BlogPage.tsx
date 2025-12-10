@@ -1,259 +1,361 @@
-import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import type { SocialFeedItem } from '@/types';
-import VerticalTimeline from '@/components/blog/VerticalTimeline';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { Calendar, ExternalLink } from 'lucide-react';
+import { publicApi } from '@/services/api';
+import { SEO } from '@/components/SEO';
 import { Button } from '@/components/ui/button';
-import { Calendar, ArrowRight } from 'lucide-react';
+import VerticalTimeline from '@/components/blog/VerticalTimeline';
+import type { SocialFeedItem } from '@/types';
 
-const API_BASE = 'http://localhost:8000/api/v1';
-
-const fetchSocialFeed = async () => {
-    const response = await fetch(`${API_BASE}/social/feed`);
-    if (!response.ok) throw new Error('Failed to fetch social feed');
-    const data = await response.json();
-    if (Array.isArray(data)) return data as SocialFeedItem[];
-    return (data?.items || []) as SocialFeedItem[];
-};
-
-// Hook to get image dimensions
-function useImageDimensions(src: string | undefined) {
-    const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
-
-    useEffect(() => {
-        if (!src) return;
-        const img = new Image();
-        img.onload = () => setDimensions({ width: img.width, height: img.height });
-        img.src = src;
-    }, [src]);
-
-    return dimensions;
-}
-
-export default function BlogPage() {
-    const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
-
-    const { data: posts, isLoading, error } = useQuery({
-        queryKey: ['social_feed'],
-        queryFn: fetchSocialFeed,
-    });
-
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-[#f8f6f3] flex items-center justify-center">
-                <div className="text-center">
-                    <div className="w-12 h-12 border-4 border-stone-300 border-t-stone-600 rounded-full animate-spin mx-auto mb-4" />
-                    <p className="text-stone-500 font-serif">Loading stories...</p>
-                </div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="min-h-screen bg-[#f8f6f3] flex items-center justify-center text-red-500">
-                Failed to load stories. Please try again later.
-            </div>
-        );
-    }
-
-    // Filter and sort posts
-    const filteredPosts = posts?.filter((post: SocialFeedItem) => {
-        if (selectedMonth && (post.posted_at || post.synced_at)) {
-            const date = new Date(post.posted_at || post.synced_at);
-            const monthLabel = date.toLocaleString('default', { month: 'long', year: 'numeric' });
-            return monthLabel === selectedMonth;
-        }
-        return true;
-    }) || [];
-
-    const pinnedPost = posts?.find((p: SocialFeedItem) => p.is_pinned);
-    const gridPosts = filteredPosts.filter((p: SocialFeedItem) => !p.is_pinned);
-    gridPosts.sort((a, b) => new Date(b.posted_at || b.synced_at).getTime() - new Date(a.posted_at || a.synced_at).getTime());
-
-    const availableMonths = Array.from(new Set(posts?.map(p => {
-        const d = new Date(p.posted_at || p.synced_at);
-        return d.toLocaleString('default', { month: 'long', year: 'numeric' });
-    }).filter(Boolean) as string[]));
-
-    // Format date helper
-    const formatDate = (dateStr: string) => {
-        const d = new Date(dateStr);
-        return d.toLocaleDateString('vi-VN', { day: '2-digit', month: 'long', year: 'numeric' });
-    };
-
-    // Get first line as title
-    const getTitle = (caption?: string) => caption?.split('\n')[0]?.slice(0, 60) || 'Flower Story';
-
+// Loading skeleton component
+function PostSkeleton() {
     return (
-        <div className="min-h-screen bg-[#f8f6f3] font-sans">
-            {/* Header */}
-            <header className="bg-[#3d3d3d] text-white py-6 px-4">
-                <div className="container mx-auto max-w-6xl flex items-center justify-between">
-                    <Link to="/blog" className="font-serif text-xl tracking-wide">
-                        Flower Stories
-                    </Link>
-                    <p className="text-sm text-stone-300 font-serif italic hidden md:block">Chuyện Của Hoa</p>
+        <div className="group py-8 first:pt-0 animate-pulse">
+            <div className="flex flex-col gap-6 md:flex-row md:gap-8">
+                <div className="flex-shrink-0 overflow-hidden rounded-xl md:w-72">
+                    <div className="aspect-[4/3] w-full bg-muted rounded-xl" />
                 </div>
-            </header>
-
-            {/* Hero Pinned Post */}
-            {pinnedPost && !selectedMonth && (
-                <section className="relative">
-                    <div className="relative h-[50vh] md:h-[60vh] overflow-hidden">
-                        <img
-                            src={pinnedPost.image_url}
-                            alt="Featured"
-                            className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-
-                        {/* PINNED badge */}
-                        <div className="absolute top-6 left-6 bg-stone-800/80 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm">
-                            ★ PINNED
-                        </div>
-
-                        {/* Content overlay */}
-                        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 text-white">
-                            <div className="container mx-auto max-w-6xl">
-                                <p className="text-sm opacity-80 mb-2 flex items-center gap-2">
-                                    <span className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs">🌸</span>
-                                    Posted by Yen Flowers
-                                </p>
-                                <h1 className="text-2xl md:text-4xl font-serif font-bold mb-4 leading-tight max-w-2xl">
-                                    {getTitle(pinnedPost.caption)}
-                                </h1>
-                                <p className="text-sm md:text-base opacity-90 max-w-xl line-clamp-2 mb-4">
-                                    {pinnedPost.caption?.split('\n').slice(1, 3).join(' ')}
-                                </p>
-                                <Link to={`/blog/${pinnedPost.id}`}>
-                                    <Button variant="secondary" className="rounded-full">
-                                        Read Story
-                                        <ArrowRight className="w-4 h-4 ml-2" />
-                                    </Button>
-                                </Link>
-                            </div>
-                        </div>
+                <div className="flex flex-1 flex-col justify-center gap-3">
+                    <div className="flex items-center gap-2">
+                        <div className="h-3 w-24 bg-muted rounded" />
+                        <div className="h-4 w-16 bg-muted rounded-full" />
                     </div>
-                </section>
-            )}
-
-            {/* Main Content */}
-            <div className="container mx-auto max-w-6xl px-4 py-12">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                    {/* Timeline Sidebar */}
-                    <aside className="lg:col-span-2">
-                        <VerticalTimeline
-                            availableMonths={availableMonths}
-                            selectedMonth={selectedMonth}
-                            onSelectMonth={setSelectedMonth}
-                        />
-                    </aside>
-
-                    {/* Posts - Row Layout with Dynamic Photo Sizing */}
-                    <main className="lg:col-span-10">
-                        <div className="space-y-16">
-                            {gridPosts.map((post) => (
-                                <PostRow
-                                    key={post.id}
-                                    post={post}
-                                    formatDate={formatDate}
-                                    getTitle={getTitle}
-                                />
-                            ))}
-                        </div>
-
-                        {gridPosts.length === 0 && (
-                            <div className="text-center py-20 bg-stone-100 rounded-2xl border border-dashed border-stone-300">
-                                <p className="text-stone-500 font-serif text-lg">No stories found for this period.</p>
-                                <Button
-                                    variant="link"
-                                    onClick={() => setSelectedMonth(null)}
-                                    className="text-stone-700 mt-2"
-                                >
-                                    View all stories
-                                </Button>
-                            </div>
-                        )}
-                    </main>
+                    <div className="h-7 w-3/4 bg-muted rounded" />
+                    <div className="space-y-2">
+                        <div className="h-4 w-full bg-muted rounded" />
+                        <div className="h-4 w-2/3 bg-muted rounded" />
+                    </div>
+                    <div className="h-4 w-32 bg-muted rounded" />
                 </div>
             </div>
-
-            {/* Footer */}
-            <footer className="bg-[#3d3d3d] text-white py-8 px-4 mt-12">
-                <div className="container mx-auto max-w-6xl text-center">
-                    <p className="font-serif text-lg mb-2">Flower Stories</p>
-                    <p className="text-sm text-stone-400">© 2025 Yen Flowers. All rights reserved.</p>
-                </div>
-            </footer>
         </div>
     );
 }
 
-// Individual post row component with dynamic image sizing
-function PostRow({
-    post,
-    formatDate,
-    getTitle
-}: {
-    post: SocialFeedItem;
-    formatDate: (date: string) => string;
-    getTitle: (caption?: string) => string;
-}) {
-    const dimensions = useImageDimensions(post.image_url);
-    const isPortrait = dimensions ? dimensions.height > dimensions.width : false;
-    const aspectRatio = dimensions ? dimensions.width / dimensions.height : 1;
+// Parse month string to year/month numbers
+function parseMonthString(monthStr: string): { year: number; month: number } | null {
+    const monthNames: Record<string, number> = {
+        'January': 1, 'February': 2, 'March': 3, 'April': 4,
+        'May': 5, 'June': 6, 'July': 7, 'August': 8,
+        'September': 9, 'October': 10, 'November': 11, 'December': 12
+    };
 
-    // Determine image column span based on aspect ratio
-    const imageColSpan = isPortrait ? 'md:col-span-1' : 'md:col-span-2';
-    const contentColSpan = isPortrait ? 'md:col-span-2' : 'md:col-span-1';
+    const parts = monthStr.split(' ');
+    if (parts.length !== 2) return null;
+
+    const monthName = parts[0];
+    const year = parseInt(parts[1]);
+    const month = monthNames[monthName];
+
+    if (!month || isNaN(year)) return null;
+    return { year, month };
+}
+
+export default function BlogPage() {
+    const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+    const [activeMonth] = useState<string | null>(null);
+    const loadMoreRef = useRef<HTMLDivElement>(null);
+
+    // Parse selected month for API query
+    const parsedMonth = selectedMonth ? parseMonthString(selectedMonth) : null;
+
+    // Fetch ALL posts with infinite scroll (when no month filter)
+    const {
+        data: infiniteData,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading: isLoadingInfinite,
+        isError: isErrorInfinite,
+    } = useInfiniteQuery({
+        queryKey: ['social_feed', 'blog', 'all'],
+        queryFn: ({ pageParam = 1 }) => publicApi.getSocialFeed(pageParam, 12),
+        getNextPageParam: (lastPage, allPages) => {
+            const totalFetched = allPages.reduce((acc, page) => acc + page.items.length, 0);
+            if (totalFetched < lastPage.total) {
+                return allPages.length + 1;
+            }
+            return undefined;
+        },
+        initialPageParam: 1,
+        enabled: !selectedMonth, // Only fetch when no month is selected
+    });
+
+    // Fetch posts for SPECIFIC month (when month filter is active)
+    const {
+        data: monthData,
+        isLoading: isLoadingMonth,
+        isError: isErrorMonth,
+    } = useQuery({
+        queryKey: ['social_feed', 'blog', 'month', parsedMonth?.year, parsedMonth?.month],
+        queryFn: () => publicApi.getSocialFeed(1, 50, parsedMonth?.year, parsedMonth?.month),
+        enabled: !!parsedMonth, // Only fetch when month is selected
+    });
+
+    // Determine which data to use
+    const isLoading = selectedMonth ? isLoadingMonth : isLoadingInfinite;
+    const isError = selectedMonth ? isErrorMonth : isErrorInfinite;
+
+    // Get posts based on mode
+    const allPosts = selectedMonth
+        ? (monthData?.items || [])
+        : (infiniteData?.pages.flatMap(page => page.items) || []);
+
+    // Get unique months for timeline (from infinite scroll data)
+    const availableMonths = [...new Set(
+        (infiniteData?.pages.flatMap(page => page.items) || []).map(post => {
+            const date = new Date(post.posted_at || post.synced_at);
+            return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        })
+    )];
+
+    // Infinite scroll observer (only when no month filter)
+    const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
+        const [target] = entries;
+        if (target.isIntersecting && hasNextPage && !isFetchingNextPage && !selectedMonth) {
+            fetchNextPage();
+        }
+    }, [fetchNextPage, hasNextPage, isFetchingNextPage, selectedMonth]);
+
+    useEffect(() => {
+        const element = loadMoreRef.current;
+        if (!element) return;
+
+        const observer = new IntersectionObserver(handleObserver, {
+            root: null,
+            rootMargin: '300px',
+            threshold: 0,
+        });
+
+        observer.observe(element);
+        return () => observer.disconnect();
+    }, [handleObserver]);
+
+    // Format date helper
+    const formatDate = (dateStr: string) => {
+        return new Date(dateStr).toLocaleDateString('en-US', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
+    };
+
+    // Get first line as title
+    const getTitle = (caption?: string) => {
+        if (!caption) return "Untitled Post";
+        const firstLine = caption.split('\n')[0];
+        return firstLine.length > 80 ? firstLine.slice(0, 80) + '...' : firstLine;
+    };
+
+    // Get excerpt from caption
+    const getExcerpt = (caption?: string) => {
+        if (!caption) return "";
+        const lines = caption.split('\n').filter(l => l.trim());
+        if (lines.length > 1) {
+            const excerpt = lines.slice(1).join(' ').slice(0, 200);
+            return excerpt + (excerpt.length >= 200 ? '...' : '');
+        }
+        return "";
+    };
 
     return (
-        <article className="group">
-            <div className={`grid gap-6 md:grid-cols-3`}>
-                {/* Image - Dynamic sizing based on actual ratio */}
-                <div className={`${imageColSpan} overflow-hidden rounded-lg`}>
-                    <Link to={`/blog/${post.id}`}>
+        <>
+            <SEO
+                title="Our Stories - YenFlowers"
+                description="Inspiration, tips, and stories from our flower studio in the heart of Ho Chi Minh City."
+            />
+
+            <div className="min-h-screen bg-background">
+                {/* Hero Section */}
+                <div className="px-4 py-10 sm:px-6 md:px-8 md:py-16 lg:px-10">
+                    <div className="mx-auto max-w-7xl">
                         <div
-                            className="relative bg-stone-100 overflow-hidden"
+                            className="flex min-h-[320px] flex-col items-center justify-center gap-6 rounded-xl bg-cover bg-center bg-no-repeat p-4 text-center md:min-h-[400px]"
                             style={{
-                                paddingBottom: dimensions ? `${(1 / aspectRatio) * 100}%` : '75%'
+                                backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.5) 100%), url("/hero-banner.jpg")`,
                             }}
                         >
-                            <img
-                                src={post.image_url}
-                                alt="Post"
-                                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            />
+                            <div className="flex flex-col gap-2">
+                                <h1 className="text-4xl font-black leading-tight tracking-[-0.033em] text-white md:text-5xl">
+                                    Our Stories in Bloom
+                                </h1>
+                                <p className="mx-auto max-w-xl text-sm font-normal leading-normal text-white/90 md:text-base">
+                                    Inspiration, tips, and stories from our flower studio in the heart of Ho Chi Minh City.
+                                </p>
+                            </div>
                         </div>
-                    </Link>
+                    </div>
                 </div>
 
-                {/* Content */}
-                <div className={`${contentColSpan} flex flex-col justify-center`}>
-                    <div className="flex items-center gap-2 text-xs text-stone-500 mb-3">
-                        <Calendar className="w-3 h-3" />
-                        {formatDate(post.posted_at || post.synced_at)}
-                    </div>
+                {/* Main Content with Timeline */}
+                <div className="px-4 pb-16 sm:px-6 md:px-8 lg:px-10">
+                    <div className="mx-auto max-w-7xl">
+                        <div className="flex flex-col gap-12 lg:flex-row">
+                            {/* Timeline Sidebar */}
+                            <aside className="hidden w-64 flex-shrink-0 lg:block">
+                                <VerticalTimeline
+                                    availableMonths={availableMonths}
+                                    selectedMonth={selectedMonth}
+                                    activeMonth={activeMonth}
+                                    onSelectMonth={setSelectedMonth}
+                                />
+                            </aside>
 
-                    <h2 className="text-xl font-serif font-semibold text-stone-800 mb-3 leading-tight">
-                        {getTitle(post.caption)}
-                    </h2>
+                            {/* Posts List */}
+                            <div className="flex-1">
+                                {/* Mobile Month Filter */}
+                                <div className="mb-6 flex flex-wrap gap-2 lg:hidden">
+                                    <Button
+                                        variant={!selectedMonth ? "default" : "outline"}
+                                        size="sm"
+                                        onClick={() => setSelectedMonth(null)}
+                                        className="rounded-full"
+                                    >
+                                        All Stories
+                                    </Button>
+                                    {availableMonths.slice(0, 5).map((month) => (
+                                        <Button
+                                            key={month}
+                                            variant={selectedMonth === month ? "default" : "outline"}
+                                            size="sm"
+                                            onClick={() => setSelectedMonth(month)}
+                                            className="rounded-full"
+                                        >
+                                            {month.split(' ')[0].slice(0, 3)}
+                                        </Button>
+                                    ))}
+                                </div>
 
-                    <p className="text-stone-600 text-sm leading-relaxed line-clamp-4 mb-4">
-                        {post.caption?.split('\n').slice(1).join(' ')}
-                    </p>
+                                {/* Selected Month Header */}
+                                {selectedMonth && (
+                                    <div className="mb-6 flex items-center justify-between rounded-lg bg-muted/50 px-4 py-3">
+                                        <span className="font-medium">
+                                            Showing stories from <span className="text-primary">{selectedMonth}</span>
+                                            {monthData && ` (${monthData.total} posts)`}
+                                        </span>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => setSelectedMonth(null)}
+                                        >
+                                            Clear filter
+                                        </Button>
+                                    </div>
+                                )}
 
-                    <div className="flex items-center gap-4 mt-auto">
-                        <Link
-                            to={`/blog/${post.id}`}
-                            className="text-sm font-medium text-stone-700 hover:text-stone-900 transition-colors"
-                        >
-                            Read More →
-                        </Link>
+                                {isLoading ? (
+                                    <div className="flex flex-col divide-y divide-border">
+                                        <PostSkeleton />
+                                        <PostSkeleton />
+                                        <PostSkeleton />
+                                    </div>
+                                ) : isError ? (
+                                    <div className="py-20 text-center">
+                                        <p className="text-lg text-muted-foreground">Failed to load stories</p>
+                                        <Button
+                                            onClick={() => window.location.reload()}
+                                            variant="outline"
+                                            className="mt-4"
+                                        >
+                                            Try again
+                                        </Button>
+                                    </div>
+                                ) : allPosts.length === 0 ? (
+                                    <div className="py-20 text-center">
+                                        <p className="text-lg text-muted-foreground">
+                                            {selectedMonth
+                                                ? `No stories found for ${selectedMonth}`
+                                                : 'No stories found'
+                                            }
+                                        </p>
+                                        {selectedMonth && (
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => setSelectedMonth(null)}
+                                                className="mt-4"
+                                            >
+                                                View all stories
+                                            </Button>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col divide-y divide-border">
+                                        {allPosts.map((post: SocialFeedItem) => (
+                                            <article key={post.id} className="group py-8 first:pt-0">
+                                                <div className="flex flex-col gap-6 md:flex-row md:gap-8">
+                                                    {/* Image */}
+                                                    <Link
+                                                        to={`/blog/${post.id}`}
+                                                        className="flex-shrink-0 overflow-hidden rounded-xl md:w-72"
+                                                    >
+                                                        <img
+                                                            src={post.image_url || 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?q=80&w=600'}
+                                                            alt={getTitle(post.caption)}
+                                                            loading="lazy"
+                                                            className="aspect-[4/3] w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                                        />
+                                                    </Link>
+
+                                                    {/* Content */}
+                                                    <div className="flex flex-1 flex-col justify-center gap-3">
+                                                        <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                            <Calendar className="h-3.5 w-3.5" />
+                                                            {formatDate(post.posted_at || post.synced_at)}
+                                                            <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium uppercase">
+                                                                {post.platform}
+                                                            </span>
+                                                        </p>
+
+                                                        <Link to={`/blog/${post.id}`}>
+                                                            <h2 className="text-xl font-bold leading-tight text-foreground transition-colors group-hover:text-primary md:text-2xl">
+                                                                {getTitle(post.caption)}
+                                                            </h2>
+                                                        </Link>
+
+                                                        <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
+                                                            {getExcerpt(post.caption)}
+                                                        </p>
+
+                                                        <a
+                                                            href={post.permalink}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                                                        >
+                                                            Read on {post.platform === 'facebook' ? 'Facebook' : 'Instagram'}
+                                                            <ExternalLink className="h-3.5 w-3.5" />
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </article>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Loading More Skeleton (only for infinite scroll mode) */}
+                                {!selectedMonth && isFetchingNextPage && (
+                                    <div className="flex flex-col divide-y divide-border border-t border-border">
+                                        <PostSkeleton />
+                                        <PostSkeleton />
+                                    </div>
+                                )}
+
+                                {/* Load More Trigger (only for infinite scroll mode) */}
+                                {!selectedMonth && (
+                                    <div ref={loadMoreRef} className="flex justify-center py-8">
+                                        {!hasNextPage && allPosts.length > 0 && (
+                                            <p className="text-sm text-muted-foreground">
+                                                You've reached the end • {allPosts.length} stories
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </article>
+        </>
     );
 }

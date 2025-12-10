@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fleur Boutique - Flower Catalog</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#a3b899",
+              "background-light": "#f8f8f8",
+              "background-dark": "#1f2a24",
+              "text-light": "#333333",
+              "text-dark": "#e0e0e0",
+              "accent-gold": "#d4af37",
+              "accent-terracotta": "#e07a5f"
+            },
+            fontFamily: {
+              "display": ["Plus Jakarta Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
+<div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- TopNavBar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/20 px-4 sm:px-6 lg:px-10 py-4 bg-white/80 dark:bg-background-dark/80 backdrop-blur-sm sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-text-light dark:text-text-dark">
+<div class="text-primary size-7">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path d="M44 4H30.6666V17.3334H17.3334V30.6666H4V44H44V4Z" fill="currentColor"></path></svg>
+</div>
+<h2 class="text-xl font-bold tracking-tight">Fleur Boutique</h2>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Home</a>
+<a class="text-sm font-bold text-primary" href="#">Shop</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">About Us</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Contact</a>
+</nav>
+</div>
+<div class="flex items-center justify-end gap-3">
+<div class="hidden sm:flex items-center justify-center">
+<button class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium hover:bg-primary/10">
+<span>VN</span>
+<span class="material-symbols-outlined !text-base">expand_more</span>
+</button>
+<button class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium hover:bg-primary/10">
+<span>EN</span>
+</button>
+</div>
+<button class="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined !text-2xl">search</span>
+</button>
+<button class="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined !text-2xl">person</span>
+</button>
+<button class="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined !text-2xl">shopping_bag</span>
+</button>
+</div>
+</header>
+<main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<!-- HeaderImage -->
+<div class="mb-12">
+<div class="bg-cover bg-center flex flex-col justify-end overflow-hidden rounded-xl min-h-[320px] lg:min-h-[400px]" data-alt="A beautiful, vibrant bouquet of seasonal flowers with soft lighting." style='background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 40%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCW9m4vyia9eb5eyPff0OgKpOSiNzhY5adjj6PvGhnpj25rFtK3Nu-NZm2v7TTCK1qqOqCFgRF9ItAFQlo82rPQpuGSWIbTZwCPH0W7zvIrvYpzMoJKhxef98exUPrM6XWt9gOhXCiCJMwX5G8tgE2BZfuJ2pDrQD9kgtPnRmKHsguedzDE-8cyFDQph2UMWuQP8iKoBoUHQR--hpQObo8wR-escdvMIHCps4McQuwqVRWsThA-cJ5ETWpcfzf2eIIIkYHnd2PACjdw");'>
+<div class="p-8"><p class="text-white text-3xl md:text-4xl lg:text-5xl font-bold max-w-2xl">Fresh from the Highlands, Delivered in HCMC</p></div>
+</div>
+</div>
+<!-- Main Content Area -->
+<div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+<!-- Filtering Sidebar (Left) -->
+<aside class="w-full lg:w-1/4 xl:w-1/5 flex-shrink-0">
+<div class="sticky top-28 space-y-8">
+<!-- Accordions for filtering -->
+<div class="flex flex-col">
+<details class="flex flex-col border-t border-primary/20 py-2 group" open="">
+<summary class="flex cursor-pointer items-center justify-between gap-6 py-2">
+<p class="font-bold">Shop by Occasion</p>
+<span class="material-symbols-outlined group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="space-y-2 pt-2 text-sm text-text-light/80 dark:text-text-dark/80">
+<a class="block hover:text-primary" href="#">Tình Yêu (Love)</a>
+<a class="block hover:text-primary" href="#">Chúc Mừng (Congratulations)</a>
+<a class="block hover:text-primary" href="#">Sinh Nhật (Birthday)</a>
+<a class="block hover:text-primary" href="#">Chia Buồn (Sympathy)</a>
+</div>
+</details>
+<details class="flex flex-col border-t border-primary/20 py-2 group">
+<summary class="flex cursor-pointer items-center justify-between gap-6 py-2">
+<p class="font-bold">Shop by Flower Type</p>
+<span class="material-symbols-outlined group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="space-y-2 pt-2 text-sm text-text-light/80 dark:text-text-dark/80">
+<a class="block hover:text-primary" href="#">Hoa Hồng (Roses)</a>
+<a class="block hover:text-primary" href="#">Hoa Lan (Orchids)</a>
+<a class="block hover:text-primary" href="#">Hoa Ly (Lilies)</a>
+<a class="block hover:text-primary" href="#">Bó Hoa Theo Mùa (Seasonal)</a>
+</div>
+</details>
+<details class="flex flex-col border-t border-b border-primary/20 py-2 group">
+<summary class="flex cursor-pointer items-center justify-between gap-6 py-2">
+<p class="font-bold">Shop by Collection</p>
+<span class="material-symbols-outlined group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="space-y-2 pt-2 text-sm text-text-light/80 dark:text-text-dark/80">
+<a class="block hover:text-primary" href="#">Signature Collection</a>
+<a class="block hover:text-primary" href="#">Luxury Bouquets</a>
+<a class="block hover:text-primary" href="#">Vase Arrangements</a>
+</div>
+</details>
+</div>
+<!-- Price Range Slider -->
+<div class="space-y-4">
+<p class="font-bold">Price Range</p>
+<input class="w-full h-2 bg-primary/20 rounded-lg appearance-none cursor-pointer accent-primary" max="5000000" min="100000" type="range" value="2500000"/>
+<div class="flex justify-between text-sm">
+<span>100.000 VNĐ</span>
+<span>5.000.000 VNĐ</span>
+</div>
+</div>
+<!-- Color Palette Filter -->
+<div class="space-y-4">
+<p class="font-bold">Color</p>
+<div class="flex flex-wrap gap-3">
+<button class="size-8 rounded-full bg-red-400 border-2 border-transparent focus:border-primary"></button>
+<button class="size-8 rounded-full bg-pink-300 border-2 border-transparent focus:border-primary"></button>
+<button class="size-8 rounded-full bg-yellow-300 border-2 border-transparent focus:border-primary"></button>
+<button class="size-8 rounded-full bg-purple-400 border-2 border-transparent focus:border-primary"></button>
+<button class="size-8 rounded-full bg-white border-2 border-gray-300 focus:border-primary"></button>
+<button class="size-8 rounded-full bg-orange-400 border-2 border-transparent focus:border-primary"></button>
+</div>
+</div>
+</div>
+</aside>
+<!-- Product Grid (Right) -->
+<div class="w-full lg:w-3/4 xl:w-4/5">
+<!-- Breadcrumbs and Sorting -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+<div class="flex flex-wrap gap-2 text-sm">
+<a class="text-text-light/70 dark:text-text-dark/70 hover:text-primary" href="#">Home</a>
+<span class="text-text-light/70 dark:text-text-dark/70">/</span>
+<a class="text-text-light/70 dark:text-text-dark/70 hover:text-primary" href="#">Shop</a>
+<span class="text-text-light/70 dark:text-text-dark/70">/</span>
+<span class="font-medium">All Flowers</span>
+</div>
+<div class="flex items-center gap-2">
+<label class="text-sm font-medium" for="sort">Sort by:</label>
+<select class="form-select text-sm rounded-lg border-primary/30 focus:ring-primary focus:border-primary bg-background-light dark:bg-background-dark dark:border-primary/50" id="sort">
+<option>Popularity</option>
+<option>Newest</option>
+<option>Price: Low to High</option>
+<option>Price: High to Low</option>
+</select>
+</div>
+</div>
+<!-- Product Card Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+<!-- Product Card 1 -->
+<div class="group flex flex-col">
+<div class="relative overflow-hidden rounded-lg">
+<img class="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A bright bouquet of orange and yellow flowers named Saigon Sunrise" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMP8lTPPbV8XnI5C5PmW2N0aXkTixSu3Srm0BfBJ8fFq8e2pAyS6GhoyJ56Rwr-0Nabc_ghyxHYgwscl8ZhiZvbijxyQgrY3XiCr82rvg38NQQGTb5LLUTf4IPz2O9vKtMt6mb0sH6Tw8Ulbbi5w9ednMUErwdhWAjimg2Yww_nNE-OFUxD54usq4hsGhcLM3rsPKq_AkkMvoFE_WvaR9ZyJYwD0NSunwH510YHMhykPBXYDpDkR8pF2wV6jAKEsd_JNQyL4Vwm7kn"/>
+<span class="absolute top-3 left-3 bg-accent-terracotta text-white text-xs font-bold px-2.5 py-1 rounded-full">Bestseller</span>
+<button class="absolute bottom-3 right-3 bg-white/80 dark:bg-background-dark/80 backdrop-blur-sm text-text-light dark:text-text-dark h-10 w-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+</button>
+</div>
+<div class="pt-4">
+<h3 class="font-bold text-lg">Saigon Sunrise</h3>
+<p class="text-primary font-semibold">850.000 VNĐ</p>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="group flex flex-col">
+<div class="relative overflow-hidden rounded-lg">
+<img class="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A lush bouquet of pink and white roses in a garden setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9aczbIkavIB-22pB-RrZXHu-yZ9mKhd17dlkVakyHF8H4TrquQ2ORkF3qL3cR7833uEOumbOl87UAc8bDbu2wVHkpeObRUzHjNQBYoMJ_m6FB6tu4jX-KtY5L6eFuqT9woEf5_15RRiHhx6oa91VXrD9MxY-qJiQvxmMy2pYELME17xOCBSRx18tvoekgUIaFrXIPn4mw8W7CobzP_m6Zutkxezi_3ja8cyFATmM0Oxd8eVW2PeE4aN4HL8QkEPK5Qvl7uX2qllHs"/>
+<button class="absolute bottom-3 right-3 bg-white/80 dark:bg-background-dark/80 backdrop-blur-sm text-text-light dark:text-text-dark h-10 w-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+</button>
+</div>
+<div class="pt-4">
+<h3 class="font-bold text-lg">Jardin de Roses</h3>
+<p class="text-primary font-semibold">1.200.000 VNĐ</p>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="group flex flex-col">
+<div class="relative overflow-hidden rounded-lg">
+<img class="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A gentle pastel bouquet with spring flowers" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9r1wze69IWKNQ6knGyPYm5223dSpOHbF7NExOcsw-m4CDwJuLcp5PvSUuCc94bjKV36BcseObF-hBolA4vF606-L1yeWNM1zyAhf3E13NkLnB0pZ0hwwbiYtiDlN3EtOfZm24Ornqv3j8fGNQUtZV1KjGDSQ7TDOq6uyxoNIWJXAoLdudlFbqmwcPYoTpR_UcYYn-JkYc2mGJQoWZPAWtg1r9cEs2lppYJgaxe09cqck20GZ_YomLudexKPAxWdBuAqNNo5cRtzLu"/>
+<span class="absolute top-3 left-3 bg-accent-gold text-white text-xs font-bold px-2.5 py-1 rounded-full">New Arrival</span>
+<button class="absolute bottom-3 right-3 bg-white/80 dark:bg-background-dark/80 backdrop-blur-sm text-text-light dark:text-text-dark h-10 w-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+</button>
+</div>
+<div class="pt-4">
+<h3 class="font-bold text-lg">Whispers of Spring</h3>
+<p class="text-primary font-semibold">950.000 VNĐ</p>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="group flex flex-col">
+<div class="relative overflow-hidden rounded-lg">
+<img class="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A sophisticated bouquet of white lilies" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMUFyqkAkBUMh8ftrbx1lmsrjLT2L_WMVxa2J_39fPcOa0lwV4jVo7r_f7JtX4QDhOvOGror4d5oOwqTcAFy0WtTzwIWMNdOgQEujyoJ-LDkHimeiY1tXZOh142-oVlZ_mqpOY9uc2ScCj_yahXvpKd4qQUlaXsl3PxfLvPPXBLdUHWxvM8w7DEeohN1BxED6kyFGthFbmg_ViqNtfCrHIxDNPmEmAh6kDc3eApJe58VPzmZu7yXosxN0FYnEZL3m-utd1M2PSrBvY"/>
+<button class="absolute bottom-3 right-3 bg-white/80 dark:bg-background-dark/80 backdrop-blur-sm text-text-light dark:text-text-dark h-10 w-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+</button>
+</div>
+<div class="pt-4">
+<h3 class="font-bold text-lg">Ivory Elegance</h3>
+<p class="text-primary font-semibold">1.500.000 VNĐ</p>
+</div>
+</div>
+<!-- Product Card 5 -->
+<div class="group flex flex-col">
+<div class="relative overflow-hidden rounded-lg">
+<img class="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A vibrant mix of colorful wildflowers" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAG1sILJwGA8R_ZsNG6H4_excUMs3V5SAvhjZ-a-_CsCuERSXiGMDHoofEyE6myuUekK07rpgXvYf0_zWD1uB-zHrBQakwIdlxGIr7G9gwTN3bdhcxjt3bLIo6no0k9fikBev2P4KFFCrfg8pJ0AmNmcKlefEOB6GZCSYUdmI44p9SCMe5nDfF3kTCj9bMOfmL0nHq7VZZkNMXu9cRjKL0Zvs8Ww4GIOZCsDUdQAlqtf1qBjv7_RQhUKrweIbcJL_qxdpXdKQMUmOlz"/>
+<button class="absolute bottom-3 right-3 bg-white/80 dark:bg-background-dark/80 backdrop-blur-sm text-text-light dark:text-text-dark h-10 w-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+</button>
+</div>
+<div class="pt-4">
+<h3 class="font-bold text-lg">Mekong Meadow</h3>
+<p class="text-primary font-semibold">750.000 VNĐ</p>
+</div>
+</div>
+<!-- Product Card 6 -->
+<div class="group flex flex-col">
+<div class="relative overflow-hidden rounded-lg">
+<img class="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A romantic bouquet of deep red roses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbcm48Pl9IJ-q_w04NSTdJIu7dEo8S71YXgTblwNNyq5onv52zVQ7_FH4GvoRRk0bXwDgzTewAo3yHg4sbrrLblCiJ-IuRVG_WMSqA_SsfEy3SWQC-KjgRc0t3rmYLx1mUxRWe5-Jbmca9Qt9mhaF1e5ihbG_zx1Zf8j6fxWY6iJfwQLE7s2iZQ_RxulTwxryHb9wvEAFvhJeC6vNBVCAnOpo5PtuITlXwZms97T6GFZWgFNmjzj866mcM601RSfSgovk_CHtpU1bp"/>
+<button class="absolute bottom-3 right-3 bg-white/80 dark:bg-background-dark/80 backdrop-blur-sm text-text-light dark:text-text-dark h-10 w-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+</button>
+</div>
+<div class="pt-4">
+<h3 class="font-bold text-lg">Eternal Passion</h3>
+<p class="text-primary font-semibold">1.800.000 VNĐ</p>
+</div>
+</div>
+</div>
+<!-- Pagination -->
+<nav class="flex items-center justify-center pt-12 mt-8 border-t border-primary/20">
+<ul class="flex items-center -space-x-px h-10 text-base">
+<li>
+<a class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-text-light/60 dark:text-text-dark/60 bg-white dark:bg-background-dark border border-primary/20 rounded-s-lg hover:bg-primary/10 hover:text-text-light dark:hover:text-text-dark" href="#">
+<span class="material-symbols-outlined">chevron_left</span>
+</a>
+</li>
+<li>
+<a aria-current="page" class="flex items-center justify-center px-4 h-10 text-white dark:text-background-dark bg-primary border border-primary/20" href="#">1</a>
+</li>
+<li>
+<a class="flex items-center justify-center px-4 h-10 leading-tight text-text-light/60 dark:text-text-dark/60 bg-white dark:bg-background-dark border border-primary/20 hover:bg-primary/10 hover:text-text-light dark:hover:text-text-dark" href="#">2</a>
+</li>
+<li>
+<a class="flex items-center justify-center px-4 h-10 leading-tight text-text-light/60 dark:text-text-dark/60 bg-white dark:bg-background-dark border border-primary/20 hover:bg-primary/10 hover:text-text-light dark:hover:text-text-dark" href="#">3</a>
+</li>
+<li>
+<a class="flex items-center justify-center px-4 h-10 leading-tight text-text-light/60 dark:text-text-dark/60 bg-white dark:bg-background-dark border border-primary/20 rounded-e-lg hover:bg-primary/10 hover:text-text-light dark:hover:text-text-dark" href="#">
+<span class="material-symbols-outlined">chevron_right</span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full bg-white/50 dark:bg-background-dark/50 mt-16 border-t border-primary/20">
+<div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-8">
+<div class="col-span-2 md:col-span-1">
+<div class="flex items-center gap-3 text-text-light dark:text-text-dark mb-4">
+<div class="text-primary size-6">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path d="M44 4H30.6666V17.3334H17.3334V30.6666H4V44H44V4Z" fill="currentColor"></path></svg>
+</div>
+<h2 class="text-lg font-bold">Fleur Boutique</h2>
+</div>
+<p class="text-sm text-text-light/70 dark:text-text-dark/70">Handcrafted bouquets for every moment, delivered with love in Ho Chi Minh City.</p>
+</div>
+<div>
+<h4 class="font-bold tracking-wider uppercase text-sm mb-4">Shop</h4>
+<nav class="flex flex-col gap-2 text-sm text-text-light/70 dark:text-text-dark/70">
+<a class="hover:text-primary" href="#">All Collections</a>
+<a class="hover:text-primary" href="#">Seasonal Flowers</a>
+<a class="hover:text-primary" href="#">For Business</a>
+<a class="hover:text-primary" href="#">Gift Cards</a>
+</nav>
+</div>
+<div>
+<h4 class="font-bold tracking-wider uppercase text-sm mb-4">Customer Service</h4>
+<nav class="flex flex-col gap-2 text-sm text-text-light/70 dark:text-text-dark/70">
+<a class="hover:text-primary" href="#">Contact Us</a>
+<a class="hover:text-primary" href="#">Delivery Information</a>
+<a class="hover:text-primary" href="#">FAQs</a>
+<a class="hover:text-primary" href="#">Return Policy</a>
+</nav>
+</div>
+<div>
+<h4 class="font-bold tracking-wider uppercase text-sm mb-4">Follow Us</h4>
+<div class="flex gap-4">
+<a class="text-text-light/70 dark:text-text-dark/70 hover:text-primary" href="#">
+<svg aria-hidden="true" class="w-6 h-6" fill="currentColor" viewbox="0 0 24 24"><path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path></svg>
+</a>
+<a class="text-text-light/70 dark:text-text-dark/70 hover:text-primary" href="#">
+<svg aria-hidden="true" class="w-6 h-6" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.584.069-4.85c.149-3.225 1.664-4.771 4.919-4.919 1.266-.057 1.644-.069 4.85-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12s.014 3.667.072 4.947c.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24s3.667-.014 4.947-.072c4.358-.2 6.78-2.618 6.98-6.98C23.986 15.667 24 15.259 24 12s-.014-3.667-.072-4.947c-.2-4.358-2.618-6.78-6.98-6.98C15.667.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z"></path></svg>
+</a>
+</div>
+</div>
+</div>
+<div class="border-t border-primary/20">
+<div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-xs text-text-light/60 dark:text-text-dark/60">
+                    © 2024 Fleur Boutique. All Rights Reserved.
+                </div>
+</div>
+</footer>
+</div>
+</div>
+</body></html>

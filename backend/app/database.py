@@ -286,3 +286,8 @@ def get_supabase():
 def get_supabase_admin():
     """Dependency for admin database client (bypasses RLS in Supabase mode)."""
     return supabase_admin
+
+
+def get_db_client():
+    """Get database client - alias for compatibility with AI services."""
+    return supabase

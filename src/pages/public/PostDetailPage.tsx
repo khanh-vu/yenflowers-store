@@ -21,7 +21,7 @@ export default function PostDetailPage() {
 
     const { data: post, isLoading, error } = useQuery({
         queryKey: ['social_post', id],
-        queryFn: () => publicApi.getSocialPost(id || ''),
+        queryFn: () => publicApi.getSocialFeedById(id || ''),
         enabled: !!id,
     });
 

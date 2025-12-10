@@ -7,13 +7,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
-from app.routers import admin, public, orders, upload, auth
+from app.routers import admin, public, orders, upload, auth, ai, occasions
 
 settings = get_settings()
 
 app = FastAPI(
     title=settings.app_name,
-    description="API for YenFlowers E-commerce Platform",
+    description="API for YenFlowers E-commerce Platform with AI Features",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
@@ -35,7 +35,9 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 # Include routers
 app.include_router(auth.router, prefix=settings.api_prefix)
-app.include_router(public.router, prefix=settings.api_prefix)
+app.include_router(ai.router, prefix=settings.api_prefix)  # AI features
+app.include_router(occasions.router, prefix=settings.api_prefix)  # Occasion memory
+app.include_router(public.router, prefix=f"{settings.api_prefix}/public")
 app.include_router(orders.router, prefix=settings.api_prefix)
 app.include_router(admin.router, prefix=settings.api_prefix)
 app.include_router(upload.router, prefix=settings.api_prefix)

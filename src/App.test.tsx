@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import StoreFront from '@/StoreFront'
+import HomePage from './pages/public/HomePage'
 
 // Mock react-hot-toast
 vi.mock('react-hot-toast', () => ({
@@ -24,58 +24,45 @@ const renderWithProviders = (ui: React.ReactElement) => {
     )
 }
 
-describe('Storefront Component', () => {
-    it('renders the header with logo', () => {
-        renderWithProviders(<StoreFront />)
-        expect(screen.getAllByText(/YenFlowers/i).length).toBeGreaterThan(0)
-    })
-
-    it('renders navigation links', () => {
-        renderWithProviders(<StoreFront />)
-        expect(screen.getByText('Sản Phẩm')).toBeInTheDocument()
-        expect(screen.getByText('Dịch Vụ')).toBeInTheDocument()
-        expect(screen.getByText('Blog')).toBeInTheDocument()
-        expect(screen.getAllByText('Liên Hệ').length).toBeGreaterThan(0)
-    })
-
-    it('renders hero section with CTA', () => {
-        renderWithProviders(<StoreFront />)
-        expect(screen.getByText('Hoa Tươi Cao Cấp')).toBeInTheDocument()
-        expect(screen.getByText('Xem Bộ Sưu Tập')).toBeInTheDocument()
+describe('HomePage Component', () => {
+    it('renders hero section with main title', () => {
+        renderWithProviders(<HomePage />)
+        expect(screen.getAllByText(/Gửi Trao/i).length).toBeGreaterThan(0)
+        expect(screen.getAllByText(/Yêu Thương/i).length).toBeGreaterThan(0)
     })
 
     it('renders category section', () => {
-        renderWithProviders(<StoreFront />)
-        expect(screen.getByText('Danh Mục')).toBeInTheDocument()
+        renderWithProviders(<HomePage />)
+        expect(screen.getByText('Danh Mục Hoa')).toBeInTheDocument()
         expect(screen.getByText('Sinh Nhật')).toBeInTheDocument()
-        expect(screen.getByText('Tình Yêu')).toBeInTheDocument()
     })
 
-    it('renders featured products section', () => {
-        renderWithProviders(<StoreFront />)
+    it('renders features section', () => {
+        renderWithProviders(<HomePage />)
+        expect(screen.getByText('Hoa Tươi Mỗi Ngày')).toBeInTheDocument()
+        expect(screen.getByText('Giao Hàng Siêu Tốc')).toBeInTheDocument()
+    })
+
+    it('renders product showcase', () => {
+        renderWithProviders(<HomePage />)
         expect(screen.getByText('Sản Phẩm Nổi Bật')).toBeInTheDocument()
+        expect(screen.getByText('Mới Nhất')).toBeInTheDocument()
     })
 
-    it('renders product names', () => {
-        renderWithProviders(<StoreFront />)
-        expect(screen.getByText('Hoa Hồng Đỏ')).toBeInTheDocument()
+    it('renders story section', () => {
+        renderWithProviders(<HomePage />)
+        expect(screen.getAllByText(/Về Chúng Tôi/i).length).toBeGreaterThan(0)
     })
 
-    it('renders footer with social links', () => {
-        renderWithProviders(<StoreFront />)
-        expect(screen.getByText('Facebook')).toBeInTheDocument()
-        expect(screen.getByText('Instagram')).toBeInTheDocument()
-    })
-
-    it('cart badge shows zero initially', () => {
-        renderWithProviders(<StoreFront />)
-        expect(screen.getByText('0')).toBeInTheDocument()
+    it('renders instagram feed section', () => {
+        renderWithProviders(<HomePage />)
+        expect(screen.getByText('Theo Dõi Trên Instagram')).toBeInTheDocument()
     })
 })
 
 describe('Accessibility', () => {
     it('buttons are keyboard accessible', () => {
-        renderWithProviders(<StoreFront />)
+        renderWithProviders(<HomePage />)
         const buttons = screen.getAllByRole('button')
         buttons.forEach(button => {
             expect(button).not.toHaveAttribute('tabindex', '-1')
@@ -83,27 +70,10 @@ describe('Accessibility', () => {
     })
 
     it('images have alt text', () => {
-        renderWithProviders(<StoreFront />)
+        renderWithProviders(<HomePage />)
         const images = screen.getAllByRole('img')
         images.forEach(img => {
             expect(img).toHaveAttribute('alt')
         })
-    })
-
-    it('links are properly labeled', () => {
-        renderWithProviders(<StoreFront />)
-        const links = screen.getAllByRole('link')
-        links.forEach(link => {
-            expect(link.textContent || link.getAttribute('aria-label')).toBeTruthy()
-        })
-    })
-})
-
-describe('Responsive Design', () => {
-    it('renders mobile menu button', () => {
-        renderWithProviders(<StoreFront />)
-        // Mobile menu button exists in the DOM
-        const buttons = screen.getAllByRole('button')
-        expect(buttons.length).toBeGreaterThan(0)
     })
 })

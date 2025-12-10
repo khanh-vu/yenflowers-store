@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Order Confirmation - Fleurs Boutique</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e0e4e2] dark:border-b-[#2a3f31] px-4 sm:px-10 py-3 fixed top-0 left-0 right-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm z-10">
+<div class="flex items-center gap-4 text-[#111813] dark:text-white">
+<div class="size-6">
+<svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-[#111813] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Fleurs Boutique</h2>
+</div>
+<div class="hidden md:flex flex-1 justify-end gap-8">
+<div class="flex items-center gap-9">
+<a class="text-[#111813] dark:text-white text-sm font-medium leading-normal" href="#">Shop</a>
+<a class="text-[#111813] dark:text-white text-sm font-medium leading-normal" href="#">About</a>
+<a class="text-[#111813] dark:text-white text-sm font-medium leading-normal" href="#">Contact</a>
+</div>
+<div class="flex gap-2">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-primary text-[#111813] text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">My Account</span>
+</button>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-black/5 dark:bg-white/10 text-[#111813] dark:text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+<span class="material-symbols-outlined text-[#111813] dark:text-white" data-icon="ShoppingCart" data-size="20px">shopping_cart</span>
+</button>
+</div>
+</div>
+<button class="md:hidden flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-black/5 dark:bg-white/10 text-[#111813] dark:text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+<span class="material-symbols-outlined text-[#111813] dark:text-white">menu</span>
+</button>
+</header>
+<main class="flex flex-1 justify-center py-5 px-4 sm:px-6 md:px-8 lg:px-10 mt-16">
+<div class="layout-content-container flex flex-col w-full max-w-4xl flex-1">
+<div class="py-10">
+<div class="flex min-w-72 flex-col gap-3 text-center">
+<p class="text-[#111813] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Thank You for Your Order!</p>
+<p class="text-[#61896f] dark:text-[#a2c8af] text-base font-normal leading-normal">Your Order #FVN1138295 is confirmed. We've sent a confirmation to your email address.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="md:col-span-2 flex flex-col gap-8">
+<div class="bg-white dark:bg-[#182e20] rounded-xl border border-[#e0e4e2] dark:border-[#2a3f31] overflow-hidden">
+<div class="flex justify-between items-center px-6 pb-3 pt-5 border-b border-[#e0e4e2] dark:border-[#2a3f31]">
+<h2 class="text-[#111813] dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Your Order</h2>
+<button class="flex items-center gap-2 text-sm font-medium text-[#61896f] dark:text-[#a2c8af] hover:text-[#111813] dark:hover:text-white">
+<span class="material-symbols-outlined text-xl">print</span>
+<span>Print</span>
+</button>
+</div>
+<div class="divide-y divide-[#e0e4e2] dark:divide-[#2a3f31]">
+<div class="flex items-center gap-4 bg-transparent px-6 min-h-[72px] py-4 justify-between">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-14" data-alt="A bouquet of vibrant flowers with pink and orange tones." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBSPTNL7syhmsAbZHqqSy7hun-2q7nh53ieCOdoii053oGR3Lx0q-xlTtHiOdXe6HQwipIMmOyH5xOJa-QuxrI6QXTatXKFMo3Oyz-BHrQ9NB1DQQe-9qap_epnA04ryDOQDaQPOh0QUUgAqNspuHL32GT9o7X0ynf1ig3DVcRJgHz_H9gdrDUB5twmgpwYqlelkhILrgVae0huiVjP-ww7DO1dm-8v1HCGiWFfSjKbPnzb8AtW781GT9-3YxKhx9HxZRYdnbCl9Kuy");'></div>
+<div class="flex flex-col justify-center">
+<p class="text-[#111813] dark:text-white text-base font-medium leading-normal line-clamp-1">The Saigon Darling Bouquet</p>
+<p class="text-[#61896f] dark:text-[#a2c8af] text-sm font-normal leading-normal line-clamp-2">Quantity: 1</p>
+</div>
+</div>
+<div class="shrink-0">
+<p class="text-[#111813] dark:text-white text-base font-normal leading-normal">1,200,000 VND</p>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-transparent px-6 min-h-[72px] py-4 justify-between">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-14" data-alt="A bunch of classic white roses." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD5zCHlGF-vHO3yOR9hFGoxl8mMORK8SxbW5-1eiSuaeqYoFmtxnrILGwo_guZQcZLi4TNssOHv89fTmi0v5Q2fytpmM86CjVkWRtunCzBfQ8qumLCXfJQX_INlFP4z-o5gRAmWVsseIac_N5j9mD_p-VUrdu2Dk1bVi1MOrIhGfjpZlqysOCgJ-CYv_SEMwFSmhJHFXNw51GT2P_LJGUOKbKjZxjLz7tRSi0erGbbojPWf2X1vFWR6WBChQAVH8B72HeKQ_0O5xr6j");'></div>
+<div class="flex flex-col justify-center">
+<p class="text-[#111813] dark:text-white text-base font-medium leading-normal line-clamp-1">Classic White Roses</p>
+<p class="text-[#61896f] dark:text-[#a2c8af] text-sm font-normal leading-normal line-clamp-2">Quantity: 1</p>
+</div>
+</div>
+<div class="shrink-0">
+<p class="text-[#111813] dark:text-white text-base font-normal leading-normal">850,000 VND</p>
+</div>
+</div>
+</div>
+<div class="p-6 border-t border-[#e0e4e2] dark:border-[#2a3f31] space-y-3">
+<div class="flex justify-between text-sm text-[#61896f] dark:text-[#a2c8af]">
+<span>Subtotal</span>
+<span>2,050,000 VND</span>
+</div>
+<div class="flex justify-between text-sm text-[#61896f] dark:text-[#a2c8af]">
+<span>Delivery Fee</span>
+<span>50,000 VND</span>
+</div>
+<div class="flex justify-between text-base font-bold text-[#111813] dark:text-white">
+<span>Total</span>
+<span>2,100,000 VND</span>
+</div>
+</div>
+</div>
+</div>
+<div class="md:col-span-1 flex flex-col gap-8">
+<div class="bg-white dark:bg-[#182e20] rounded-xl border border-[#e0e4e2] dark:border-[#2a3f31] p-6">
+<h3 class="text-lg font-bold text-[#111813] dark:text-white mb-4">Delivery Details</h3>
+<div class="space-y-4 text-sm">
+<div>
+<p class="font-medium text-[#61896f] dark:text-[#a2c8af]">Estimated Delivery</p>
+<p class="text-[#111813] dark:text-white">Tuesday, 28 May 2024</p>
+</div>
+<div>
+<p class="font-medium text-[#61896f] dark:text-[#a2c8af]">Shipping to</p>
+<p class="text-[#111813] dark:text-white">Jane Doe<br/>123 Le Loi Street, District 1<br/>Ho Chi Minh City, Vietnam</p>
+</div>
+</div>
+<button class="mt-6 w-full flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-6 bg-primary text-[#111813] text-base font-bold leading-normal tracking-[0.015em] gap-2">
+<span class="material-symbols-outlined text-xl">local_shipping</span>
+<span class="truncate">Track Order</span>
+</button>
+</div>
+<div class="bg-white dark:bg-[#182e20] rounded-xl border border-[#e0e4e2] dark:border-[#2a3f31] p-6 text-center">
+<h3 class="text-lg font-bold text-[#111813] dark:text-white mb-2">Need Help?</h3>
+<p class="text-sm text-[#61896f] dark:text-[#a2c8af] mb-4">Contact us for any questions about your order.</p>
+<div class="flex justify-center gap-4 text-sm">
+<a class="text-primary font-bold flex items-center gap-1.5 hover:underline" href="tel:+84123456789">
+<span class="material-symbols-outlined text-base">call</span>
+                                        Hotline
+                                    </a>
+<a class="text-primary font-bold flex items-center gap-1.5 hover:underline" href="mailto:support@fleurs.vn">
+<span class="material-symbols-outlined text-base">email</span>
+                                        Email
+                                    </a>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-12">
+<div class="text-center mb-8">
+<h2 class="text-[#111813] dark:text-white text-3xl font-bold leading-tight tracking-[-0.015em]">You Might Also Like</h2>
+<p class="text-[#61896f] dark:text-[#a2c8af] text-base mt-2">Perfect additions for your next occasion.</p>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+<div class="bg-white dark:bg-[#182e20] rounded-xl border border-[#e0e4e2] dark:border-[#2a3f31] p-4 flex flex-col items-center text-center">
+<div class="w-full h-40 bg-cover bg-center rounded-lg mb-4" data-alt="A small, elegant bouquet of lilies and baby's breath." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAPdzfZ8WFJzORdDuHeZXqjauU1sApCYalY9i0sVAE7cIkLcBpJoCpAkqGtInuc--CS5M5ii-i4JWSizzIc1Jc52Y7czfDUovDAe3tkY4WzjTxOljCRmTeOjC54kN5AauGLd4I0BZ_NQ9WSEhh7FytgJLajVYnS40Y53G7HxC8Eb9yGBaDG5YhLhmZYr1RE-qqV65MxK_n5Rhpmio9ZexkhayRDj7jWvGZSv4tiIrLP6gvV2wYMQCEzgiOfyg6ILZFAPxGVv2RASljo")'></div>
+<h4 class="text-base font-bold text-[#111813] dark:text-white leading-tight">Petite Lily Joy</h4>
+<p class="text-sm text-[#61896f] dark:text-[#a2c8af] mt-1">650,000 VND</p>
+<button class="mt-4 w-full flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-black/5 dark:bg-white/10 text-[#111813] dark:text-white text-sm font-bold leading-normal tracking-[0.015em] gap-2">
+<span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+<span class="truncate">Add to Cart</span>
+</button>
+</div>
+<div class="bg-white dark:bg-[#182e20] rounded-xl border border-[#e0e4e2] dark:border-[#2a3f31] p-4 flex flex-col items-center text-center">
+<div class="w-full h-40 bg-cover bg-center rounded-lg mb-4" data-alt="A box of premium assorted chocolates." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBdOWPgp4efQArqrWvSdkMtKQtVFpClSdMcwVniqk4w7KZvGCCv3WLZcevJcneyFewx1M6jkiXREA_PrSB5kX17jH9RdSERTwPZG7SfR5DR-pmZF-SKtx4Ak-VChu8svU9IG65ENEWMR4rA6UxsjvjZvcrIKZCRL5dgImjgF-bYuW6NzaFUwSqH40cJr0iaEgRouOyAOAnz1u4OGXiDSEZl9aetQPniXlvOcgMEhmT8eN1d7XermnGE-6Fbem7UfYEDoPHBDmodUZTN")'></div>
+<h4 class="text-base font-bold text-[#111813] dark:text-white leading-tight">Artisan Chocolate Box</h4>
+<p class="text-sm text-[#61896f] dark:text-[#a2c8af] mt-1">450,000 VND</p>
+<button class="mt-4 w-full flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-black/5 dark:bg-white/10 text-[#111813] dark:text-white text-sm font-bold leading-normal tracking-[0.015em] gap-2">
+<span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+<span class="truncate">Add to Cart</span>
+</button>
+</div>
+<div class="bg-white dark:bg-[#182e20] rounded-xl border border-[#e0e4e2] dark:border-[#2a3f31] p-4 flex flex-col items-center text-center">
+<div class="w-full h-40 bg-cover bg-center rounded-lg mb-4" data-alt="An elegant scented candle in a glass jar." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCypNXSi2y2m04F8vkst1cDYqYFck5Xp6kEpiYpby8aFCX3udyRRCXmoQXQmnGByEUxQyLqyY3Bdet2mufGLwyca3DAI-yX9rnDzR9xlGZhZTAcoQIA34oNels_4zUzvkN8YNkFsD3TmW-JWbI83QjzycoPlVgOMbOVd3mHmwbW4lycsVFb5fKOMyDRCSvqATAHLipvFqHwvDuV4LDmJn2OvPClPsTZRC8uoFn7-t5tn7ksmAnlcwCsMdvkjw5YPzxKQwEFAu2YHTWn")'></div>
+<h4 class="text-base font-bold text-[#111813] dark:text-white leading-tight">Jasmine Scented Candle</h4>
+<p class="text-sm text-[#61896f] dark:text-[#a2c8af] mt-1">380,000 VND</p>
+<button class="mt-4 w-full flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-black/5 dark:bg-white/10 text-[#111813] dark:text-white text-sm font-bold leading-normal tracking-[0.015em] gap-2">
+<span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+<span class="truncate">Add to Cart</span>
+</button>
+</div>
+</div>
+</div>
+<div class="mt-12 flex flex-col sm:flex-row justify-center items-center gap-4">
+<button class="w-full sm:w-auto flex min-w-[180px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-6 bg-black/5 dark:bg-white/10 text-[#111813] dark:text-white text-base font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">Continue Shopping</span>
+</button>
+</div>
+</div>
+</main>
+</div>
+</div>
+</body></html>
