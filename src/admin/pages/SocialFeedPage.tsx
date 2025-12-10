@@ -1,10 +1,11 @@
 // ==========================================
 // Social Feed (Facebook Sync) Page
 // Real batch sync with progress bar
+// With bulk import and required category
 // ==========================================
 
 import { useState, useEffect } from 'react';
-import { RefreshCw, Facebook, Instagram, Import, Check, ExternalLink, ImageIcon, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { RefreshCw, Facebook, Instagram, Import, Check, ExternalLink, ImageIcon, Loader2, ChevronLeft, ChevronRight, CheckSquare, Square, Package } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,15 +15,26 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { socialFeedApi } from '@/services/api';
-import type { SocialFeedItem } from '@/types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { socialFeedApi, categoriesApi } from '@/services/api';
+import type { SocialFeedItem, Category } from '@/types';
 
 const formatDate = (d: string) => new Date(d).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
 const PAGE_SIZE = 24;
 
 // Sub-component for individual feed items to handle carousel state independent of main list
-function SocialFeedItemCard({ item, onImport }: { item: SocialFeedItem; onImport: (item: SocialFeedItem) => void }) {
+function SocialFeedItemCard({
+    item,
+    onImport,
+    isSelected,
+    onToggleSelect
+}: {
+    item: SocialFeedItem;
+    onImport: (item: SocialFeedItem) => void;
+    isSelected: boolean;
+    onToggleSelect: (id: string) => void;
+}) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const images = (item.image_urls && item.image_urls.length > 0) ? item.image_urls : (item.image_url ? [item.image_url] : []);
     const hasMultipleImages = images.length > 1;
@@ -37,8 +49,27 @@ function SocialFeedItemCard({ item, onImport }: { item: SocialFeedItem; onImport
         setCurrentImageIndex(prev => (prev - 1 + images.length) % images.length);
     };
 
+    const handleSelectClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onToggleSelect(item.id);
+    };
+
     return (
-        <Card className="overflow-hidden group">
+        <Card className={`overflow-hidden group relative ${isSelected ? 'ring-2 ring-pink-500' : ''}`}>
+            {/* Selection checkbox for not-imported items */}
+            {!item.is_imported_as_product && (
+                <button
+                    onClick={handleSelectClick}
+                    className="absolute top-2 right-2 z-20 p-1 rounded bg-white/80 hover:bg-white shadow-sm"
+                >
+                    {isSelected ? (
+                        <CheckSquare className="h-5 w-5 text-pink-500" />
+                    ) : (
+                        <Square className="h-5 w-5 text-gray-500" />
+                    )}
+                </button>
+            )}
+
             <div className="relative aspect-square bg-muted">
                 {images.length > 0 ? (
                     <img
@@ -61,7 +92,7 @@ function SocialFeedItemCard({ item, onImport }: { item: SocialFeedItem; onImport
 
                 {hasMultipleImages && (
                     <>
-                        <div className="absolute top-2 right-2 z-10">
+                        <div className="absolute top-2 right-10 z-10">
                             <Badge variant="secondary" className="bg-black/50 text-white hover:bg-black/70 backdrop-blur-sm">
                                 <ImageIcon className="h-3 w-3 mr-1" />
                                 {currentImageIndex + 1}/{images.length}
@@ -144,7 +175,14 @@ export default function SocialFeedPage() {
     const [fbTotal, setFbTotal] = useState(0);
     const [syncedCount, setSyncedCount] = useState(0);
     const [importModal, setImportModal] = useState<SocialFeedItem | null>(null);
-    const [importForm, setImportForm] = useState({ name_vi: '', price: 0 });
+    const [importForm, setImportForm] = useState({ name_vi: '', price: 0, category_id: '' });
+    const [categories, setCategories] = useState<Category[]>([]);
+
+    // Selection for bulk import
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const [bulkImportModal, setBulkImportModal] = useState(false);
+    const [bulkCategory, setBulkCategory] = useState('');
+    const [bulkImporting, setBulkImporting] = useState(false);
 
     // Pagination state
     const [page, setPage] = useState(1);
@@ -159,6 +197,7 @@ export default function SocialFeedPage() {
             setTotalPages(response.total_pages);
             setTotalItems(response.total);
             setPage(pageNum);
+            setSelectedIds(new Set()); // Clear selection on page change
         } catch (error) {
             toast.error('Không thể tải bài đăng');
         } finally {
@@ -166,8 +205,18 @@ export default function SocialFeedPage() {
         }
     };
 
+    const loadCategories = async () => {
+        try {
+            const cats = await categoriesApi.list(false);
+            setCategories(cats);
+        } catch (error) {
+            console.error('Failed to load categories', error);
+        }
+    };
+
     useEffect(() => {
         loadFeed(1);
+        loadCategories();
     }, []);
 
     // Real batch sync with progress
@@ -241,10 +290,14 @@ export default function SocialFeedPage() {
         const name = item.caption?.split(/[#\n]/)[0].trim().slice(0, 50) || 'Sản phẩm mới';
         // Suggest price if we can finding numbers, else default
         // Simple regex to find money-like numbers could be added here
-        setImportForm({ name_vi: name, price: 300000 });
+        setImportForm({ name_vi: name, price: 300000, category_id: '' });
     };
 
     const handleImport = async () => {
+        if (!importForm.category_id) {
+            toast.error('Vui lòng chọn danh mục');
+            return;
+        }
         if (importModal) {
             try {
                 await socialFeedApi.importAsProduct(importModal.id, importForm);
@@ -257,11 +310,81 @@ export default function SocialFeedPage() {
         }
     };
 
+    const toggleSelect = (id: string) => {
+        const newSelected = new Set(selectedIds);
+        if (newSelected.has(id)) {
+            newSelected.delete(id);
+        } else {
+            newSelected.add(id);
+        }
+        setSelectedIds(newSelected);
+    };
+
+    const selectAllNotImported = () => {
+        const notImportedIds = feed.filter(f => !f.is_imported_as_product).map(f => f.id);
+        if (selectedIds.size === notImportedIds.length) {
+            setSelectedIds(new Set());
+        } else {
+            setSelectedIds(new Set(notImportedIds));
+        }
+    };
+
+    const openBulkImport = () => {
+        if (selectedIds.size === 0) {
+            toast.error('Vui lòng chọn ít nhất một bài đăng');
+            return;
+        }
+        setBulkCategory('');
+        setBulkImportModal(true);
+    };
+
+    const handleBulkImport = async () => {
+        if (!bulkCategory) {
+            toast.error('Vui lòng chọn danh mục');
+            return;
+        }
+
+        setBulkImporting(true);
+        try {
+            const items = Array.from(selectedIds).map(id => {
+                const feedItem = feed.find(f => f.id === id);
+                const name = feedItem?.caption?.split(/[#\n]/)[0].trim().slice(0, 50) || 'Sản phẩm mới';
+                return {
+                    feed_id: id,
+                    name_vi: name,
+                    // No price - will default to 0
+                };
+            });
+
+            const result = await socialFeedApi.bulkImport({
+                category_id: bulkCategory,
+                items
+            });
+
+            // Update feed state for imported items
+            const importedIds = new Set(result.imported.map(i => i.feed_id));
+            setFeed(feed.map(f => importedIds.has(f.id) ? { ...f, is_imported_as_product: true } : f));
+            setSelectedIds(new Set());
+            setBulkImportModal(false);
+
+            toast.success(`Đã import ${result.total_imported} sản phẩm!`);
+            if (result.total_failed > 0) {
+                toast.error(`${result.total_failed} bài đăng lỗi`);
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'Bulk import thất bại');
+        } finally {
+            setBulkImporting(false);
+        }
+    };
+
     const goToPage = (newPage: number) => {
         if (newPage >= 1 && newPage <= totalPages) {
             loadFeed(newPage);
         }
     };
+
+    const notImportedCount = feed.filter(f => !f.is_imported_as_product).length;
 
     return (
         <div className="space-y-6">
@@ -272,17 +395,28 @@ export default function SocialFeedPage() {
                         {totalItems} bài đăng trong DB
                     </p>
                 </div>
-                <Button
-                    onClick={handleSyncBatches}
-                    disabled={syncing}
-                    className="bg-gradient-to-r from-blue-500 to-blue-600 text-white min-w-[160px]"
-                >
-                    {syncing ? (
-                        <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Đang sync...</>
-                    ) : (
-                        <><RefreshCw className="h-4 w-4 mr-2" />Sync Facebook</>
+                <div className="flex gap-2">
+                    {selectedIds.size > 0 && (
+                        <Button
+                            onClick={openBulkImport}
+                            className="bg-gradient-to-r from-pink-500 to-rose-500 text-white"
+                        >
+                            <Package className="h-4 w-4 mr-2" />
+                            Bulk Import ({selectedIds.size})
+                        </Button>
                     )}
-                </Button>
+                    <Button
+                        onClick={handleSyncBatches}
+                        disabled={syncing}
+                        className="bg-gradient-to-r from-blue-500 to-blue-600 text-white min-w-[160px]"
+                    >
+                        {syncing ? (
+                            <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Đang sync...</>
+                        ) : (
+                            <><RefreshCw className="h-4 w-4 mr-2" />Sync Facebook</>
+                        )}
+                    </Button>
+                </div>
             </div>
 
             {/* Progress Bar */}
@@ -303,6 +437,22 @@ export default function SocialFeedPage() {
                 </Card>
             )}
 
+            {/* Selection Controls */}
+            {notImportedCount > 0 && (
+                <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                    <Button variant="outline" size="sm" onClick={selectAllNotImported}>
+                        {selectedIds.size === notImportedCount ? (
+                            <><CheckSquare className="h-4 w-4 mr-2" />Bỏ chọn tất cả</>
+                        ) : (
+                            <><Square className="h-4 w-4 mr-2" />Chọn tất cả ({notImportedCount})</>
+                        )}
+                    </Button>
+                    <span className="text-sm text-muted-foreground">
+                        Đã chọn: {selectedIds.size} bài đăng
+                    </span>
+                </div>
+            )}
+
             {/* Stats Cards */}
             <div className="grid grid-cols-4 gap-4">
                 <Card><CardContent className="p-4 flex items-center gap-4"><div className="p-3 rounded-xl bg-blue-500/10"><Facebook className="h-6 w-6 text-blue-500" /></div><div><div className="text-2xl font-bold">{totalItems}</div><div className="text-sm text-muted-foreground">Tổng bài</div></div></CardContent></Card>
@@ -317,7 +467,13 @@ export default function SocialFeedPage() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {feed.map(item => (
-                        <SocialFeedItemCard key={item.id} item={item} onImport={openImport} />
+                        <SocialFeedItemCard
+                            key={item.id}
+                            item={item}
+                            onImport={openImport}
+                            isSelected={selectedIds.has(item.id)}
+                            onToggleSelect={toggleSelect}
+                        />
                     ))}
                 </div>
             )}
@@ -349,15 +505,111 @@ export default function SocialFeedPage() {
                 </div>
             )}
 
-            {/* Import Modal */}
-            <Dialog open={!!importModal} onOpenChange={() => setImportModal(null)}><DialogContent>
-                <DialogHeader><DialogTitle>Import làm sản phẩm</DialogTitle></DialogHeader>
-                {importModal && <>
-                    <div className="flex gap-4"><img src={importModal.image_url} alt="" className="w-24 h-24 rounded-lg object-cover" /><div className="flex-1"><p className="text-sm text-muted-foreground line-clamp-3">{importModal.caption}</p></div></div>
-                    <div className="space-y-4"><div><Label>Tên sản phẩm *</Label><Input value={importForm.name_vi} onChange={e => setImportForm({ ...importForm, name_vi: e.target.value })} /></div><div><Label>Giá (VND) *</Label><Input type="text" value={Number(importForm.price).toLocaleString('vi-VN')} onChange={e => { const raw = e.target.value.replace(/\D/g, ''); setImportForm({ ...importForm, price: Number(raw) || 0 }); }} /></div></div>
-                </>}
-                <DialogFooter><Button variant="outline" onClick={() => setImportModal(null)}>Hủy</Button><Button onClick={handleImport} className="bg-pink-500 text-white">Import</Button></DialogFooter>
-            </DialogContent></Dialog>
+            {/* Single Import Modal */}
+            <Dialog open={!!importModal} onOpenChange={() => setImportModal(null)}>
+                <DialogContent>
+                    <DialogHeader><DialogTitle>Import làm sản phẩm</DialogTitle></DialogHeader>
+                    {importModal && <>
+                        <div className="flex gap-4">
+                            <img src={importModal.image_url} alt="" className="w-24 h-24 rounded-lg object-cover" />
+                            <div className="flex-1">
+                                <p className="text-sm text-muted-foreground line-clamp-3">{importModal.caption}</p>
+                            </div>
+                        </div>
+                        <div className="space-y-4">
+                            <div>
+                                <Label>Tên sản phẩm *</Label>
+                                <Input value={importForm.name_vi} onChange={e => setImportForm({ ...importForm, name_vi: e.target.value })} />
+                            </div>
+                            <div>
+                                <Label>Danh mục *</Label>
+                                <Select value={importForm.category_id} onValueChange={v => setImportForm({ ...importForm, category_id: v })}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Chọn danh mục..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {categories.map(c => (
+                                            <SelectItem key={c.id} value={c.id}>{c.name_vi}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div>
+                                <Label>Giá (VND) *</Label>
+                                <Input
+                                    type="text"
+                                    value={Number(importForm.price).toLocaleString('vi-VN')}
+                                    onChange={e => {
+                                        const raw = e.target.value.replace(/\D/g, '');
+                                        setImportForm({ ...importForm, price: Number(raw) || 0 });
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </>}
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setImportModal(null)}>Hủy</Button>
+                        <Button onClick={handleImport} className="bg-pink-500 text-white" disabled={!importForm.category_id}>Import</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Bulk Import Modal */}
+            <Dialog open={bulkImportModal} onOpenChange={setBulkImportModal}>
+                <DialogContent>
+                    <DialogHeader><DialogTitle>Bulk Import ({selectedIds.size} bài đăng)</DialogTitle></DialogHeader>
+                    <div className="space-y-4">
+                        <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                            <p className="text-sm text-amber-800">
+                                <strong>Lưu ý:</strong> Bulk import sẽ tạo sản phẩm với giá mặc định là 0đ.
+                                Bạn có thể chỉnh sửa giá sau trong trang quản lý sản phẩm.
+                            </p>
+                        </div>
+                        <div>
+                            <Label>Danh mục cho tất cả sản phẩm *</Label>
+                            <Select value={bulkCategory} onValueChange={setBulkCategory}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Chọn danh mục..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {categories.map(c => (
+                                        <SelectItem key={c.id} value={c.id}>{c.name_vi}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                            <p>Các bài đăng sẽ được import:</p>
+                            <ul className="mt-2 max-h-40 overflow-y-auto space-y-1">
+                                {Array.from(selectedIds).map(id => {
+                                    const item = feed.find(f => f.id === id);
+                                    const name = item?.caption?.split(/[#\n]/)[0].trim().slice(0, 40) || 'Sản phẩm mới';
+                                    return (
+                                        <li key={id} className="flex items-center gap-2">
+                                            <Check className="h-3 w-3 text-green-500" />
+                                            <span className="truncate">{name}</span>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setBulkImportModal(false)} disabled={bulkImporting}>Hủy</Button>
+                        <Button
+                            onClick={handleBulkImport}
+                            className="bg-pink-500 text-white"
+                            disabled={!bulkCategory || bulkImporting}
+                        >
+                            {bulkImporting ? (
+                                <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Đang import...</>
+                            ) : (
+                                <>Import {selectedIds.size} sản phẩm</>
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

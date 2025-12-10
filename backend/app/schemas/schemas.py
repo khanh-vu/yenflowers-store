@@ -262,7 +262,19 @@ class ImportAsProductRequest(BaseModel):
     name_vi: str
     name_en: Optional[str] = None
     price: int
-    category_id: Optional[UUID] = None
+    category_id: UUID  # Required
+
+
+class BulkImportItem(BaseModel):
+    feed_id: UUID
+    name_vi: str
+    name_en: Optional[str] = None
+    price: Optional[int] = 0  # Optional, defaults to 0
+
+
+class BulkImportAsProductRequest(BaseModel):
+    category_id: UUID  # Required for bulk import
+    items: list[BulkImportItem]
 
 
 class SocialSyncRequest(BaseModel):

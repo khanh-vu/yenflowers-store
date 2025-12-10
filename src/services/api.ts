@@ -253,8 +253,20 @@ export const socialFeedApi = {
     getSyncStatus: (refreshCount = false) =>
         apiRequest<{ fb_total_posts: number; total_in_db: number; has_cursor: boolean; progress: number; last_sync: string | null }>(`/admin/social/sync-status?refresh_count=${refreshCount}`),
 
-    importAsProduct: (feedId: string, data: { name_vi: string; price: number; category_id?: string }) =>
+    importAsProduct: (feedId: string, data: { name_vi: string; price: number; category_id: string }) =>
         apiRequest<Product>(`/admin/social/${feedId}/import-product`, {
+            method: 'POST',
+            body: JSON.stringify(data),
+        }),
+
+    bulkImport: (data: { category_id: string; items: Array<{ feed_id: string; name_vi: string; price?: number }> }) =>
+        apiRequest<{
+            message: string;
+            imported: Array<{ feed_id: string; product_id: string; name: string }>;
+            failed: Array<{ feed_id: string; error: string }>;
+            total_imported: number;
+            total_failed: number;
+        }>('/admin/social/bulk-import', {
             method: 'POST',
             body: JSON.stringify(data),
         }),
@@ -284,12 +296,49 @@ export const settingsApi = {
 // ==========================================
 
 export const publicApi = {
-    getSocialFeed: () =>
-        apiRequest<SocialFeedItem[]>('/social/feed'),
+    getSocialFeed: (page = 1, page_size = 12, year?: number, month?: number) => {
+        const query = new URLSearchParams();
+        query.set('page', String(page));
+        query.set('page_size', String(page_size));
+        if (year) query.set('year', String(year));
+        if (month) query.set('month', String(month));
+        return apiRequest<PaginatedResponse<SocialFeedItem>>(`/public/social/feed?${query.toString()}`);
+    },
 
-    getSocialPost: (id: string) =>
-        apiRequest<SocialFeedItem>(`/social/feed/${id}`),
+    getSocialFeedById: (id: string) =>
+        apiRequest<SocialFeedItem>(`/public/social/feed/${id}`),
 
+    // NEW: Categories for public consumption
+    getCategories: () =>
+        apiRequest<Category[]>('/public/categories'),
+
+    // NEW: Products endpoints for public
+    getProducts: (params: ProductsListParams = {}) => {
+        const query = new URLSearchParams();
+        if (params.page) query.set('page', String(params.page));
+        if (params.page_size) query.set('page_size', String(params.page_size));
+        if (params.category_id) query.set('category_id', params.category_id);
+        if (params.is_published !== undefined) query.set('is_published', String(params.is_published));
+        if (params.is_featured !== undefined) query.set('is_featured', String(params.is_featured));
+        if (params.search) query.set('search', params.search);
+
+        return apiRequest<PaginatedResponse<Product>>(`/public/products?${query.toString()}`);
+    },
+
+    getFeaturedProducts: (limit = 8) =>
+        apiRequest<PaginatedResponse<Product>>(`/public/products?is_featured=true&page_size=${limit}&is_published=true`),
+
+    getProductById: (id: string) =>
+        apiRequest<Product>(`/public/products/${id}`),
+
+    getProductsByCategory: (categoryId: string, page = 1, limit = 12) => {
+        const query = new URLSearchParams();
+        query.set('category_id', categoryId);
+        query.set('page', String(page));
+        query.set('page_size', String(limit));
+        query.set('is_published', 'true');
+        return apiRequest<PaginatedResponse<Product>>(`/public/products?${query.toString()}`);
+    },
     getBlogPosts: (page = 1, pageSize = 10, tag?: string) => {
         const query = new URLSearchParams({
             page: String(page),

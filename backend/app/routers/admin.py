@@ -13,7 +13,7 @@ from app.schemas.schemas import (
     ProductCreate, ProductUpdate, ProductResponse,
     OrderResponse, OrderStatusUpdate,
     BlogPostCreate, BlogPostUpdate, BlogPostResponse,
-    SocialFeedResponse, ImportAsProductRequest, SocialSyncRequest,
+    SocialFeedResponse, ImportAsProductRequest, BulkImportAsProductRequest, SocialSyncRequest,
     PaginatedResponse
 )
 from app.services.facebook_sync import get_fb_service
@@ -717,6 +717,108 @@ async def import_as_product(
     }).eq("id", str(feed_id)).execute()
     
     return result.data[0]
+
+
+@router.post("/social/bulk-import")
+async def bulk_import_as_products(
+    data: BulkImportAsProductRequest,
+    db: Client = Depends(get_supabase_admin)
+):
+    """
+    Bulk import multiple social feed items as products.
+    Category is required, price is optional (defaults to 0).
+    """
+    import re
+    import unicodedata
+    
+    imported = []
+    failed = []
+    
+    for item in data.items:
+        try:
+            # Get the feed item
+            feed = db.table("social_feed").select("*").eq("id", str(item.feed_id)).execute()
+            if not feed.data:
+                failed.append({"feed_id": str(item.feed_id), "error": "Feed item not found"})
+                continue
+                
+            feed_item = feed.data[0]
+            
+            # Skip if already imported
+            if feed_item.get("is_imported_as_product"):
+                failed.append({"feed_id": str(item.feed_id), "error": "Already imported"})
+                continue
+            
+            # Create slug from name - remove Vietnamese accents
+            name_normalized = unicodedata.normalize('NFD', item.name_vi)
+            name_ascii = ''.join(c for c in name_normalized if unicodedata.category(c) != 'Mn')
+            name_ascii = name_ascii.replace('đ', 'd').replace('Đ', 'D')
+            slug = re.sub(r'[^a-z0-9]+', '-', name_ascii.lower()).strip('-')
+            
+            # Ensure unique slug by appending timestamp
+            from datetime import datetime
+            slug = f"{slug}-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+            
+            # Get all images from feed item
+            feed_images = feed_item.get("image_urls") or []
+            if not feed_images and feed_item.get("image_url"):
+                feed_images = [feed_item["image_url"]]
+            
+            # Create product images array
+            product_images = []
+            for i, img in enumerate(feed_images):
+                if isinstance(img, dict):
+                    url = img.get("url")
+                else:
+                    url = img
+                    
+                if url:
+                    product_images.append({
+                        "url": url, 
+                        "alt": item.name_vi, 
+                        "sort_order": i
+                    })
+            
+            # Create product with category (price defaults to 0 if not provided)
+            product_data = {
+                "slug": slug,
+                "name_vi": item.name_vi,
+                "name_en": item.name_en,
+                "price": item.price or 0,
+                "category_id": str(data.category_id),
+                "images": product_images,
+                "description_vi": feed_item.get("caption"),
+                "fb_post_id": feed_item["post_id"],
+                "is_published": False  # Draft by default
+            }
+            
+            result = db.table("products").insert(product_data).execute()
+            if not result.data:
+                failed.append({"feed_id": str(item.feed_id), "error": "Failed to create product"})
+                continue
+            
+            # Mark feed item as imported
+            db.table("social_feed").update({
+                "is_imported_as_product": True,
+                "imported_product_id": result.data[0]["id"]
+            }).eq("id", str(item.feed_id)).execute()
+            
+            imported.append({
+                "feed_id": str(item.feed_id),
+                "product_id": result.data[0]["id"],
+                "name": item.name_vi
+            })
+            
+        except Exception as e:
+            failed.append({"feed_id": str(item.feed_id), "error": str(e)})
+    
+    return {
+        "message": f"Imported {len(imported)} products, {len(failed)} failed",
+        "imported": imported,
+        "failed": failed,
+        "total_imported": len(imported),
+        "total_failed": len(failed)
+    }
 
 
 # =====================================================
