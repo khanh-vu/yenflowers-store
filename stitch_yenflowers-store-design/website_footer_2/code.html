@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Website Footer - Fleur Boutique</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#13ec5b",
+            "background-light": "#f6f8f6",
+            "background-dark": "#102216",
+            "text-light": "#333333",
+            "text-dark": "#E0E0E0",
+            "accent": "#6B8E23",
+            "border-light": "#e5e7eb",
+            "border-dark": "#374151"
+          },
+          fontFamily: {
+            "display": ["Plus Jakarta Sans", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.5rem",
+            "lg": "1rem",
+            "xl": "1.5rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<div class="flex-grow">
+</div>
+<footer class="bg-white dark:bg-black/20 w-full pt-16 pb-8 px-4 sm:px-6 lg:px-8">
+<div class="max-w-7xl mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+<div class="space-y-4">
+<h3 class="text-xl font-semibold text-text-light dark:text-white">Fleur Boutique</h3>
+<p class="text-sm text-text-light/80 dark:text-text-dark/80">Crafting moments with nature's finest.</p>
+<ul class="space-y-2 text-sm">
+<li class="flex items-start">
+<span class="material-symbols-outlined text-base mr-2 mt-0.5 text-accent">location_on</span>
+<span>123 Floral Ave, District 1<br/>Ho Chi Minh City, Vietnam</span>
+</li>
+<li class="flex items-center">
+<span class="material-symbols-outlined text-base mr-2 text-accent">phone</span>
+<span>+84 123 456 789</span>
+</li>
+<li class="flex items-center">
+<span class="material-symbols-outlined text-base mr-2 text-accent">mail</span>
+<span>hello@fleurboutique.vn</span>
+</li>
+</ul>
+</div>
+<div class="space-y-4">
+<h3 class="text-lg font-medium text-text-light dark:text-white">Our Shop</h3>
+<ul class="space-y-2 text-sm">
+<li><a class="hover:text-accent transition-colors" href="#">About Us</a></li>
+<li><a class="hover:text-accent transition-colors" href="#">Blog</a></li>
+<li><a class="hover:text-accent transition-colors" href="#">Contact Us</a></li>
+<li><a class="hover:text-accent transition-colors" href="#">Delivery Information</a></li>
+<li><a class="hover:text-accent transition-colors" href="#">Careers</a></li>
+</ul>
+</div>
+<div class="space-y-4">
+<h3 class="text-lg font-medium text-text-light dark:text-white">Shop by Occasion</h3>
+<ul class="space-y-2 text-sm">
+<li><a class="hover:text-accent transition-colors" href="#">Bouquets</a></li>
+<li><a class="hover:text-accent transition-colors" href="#">Wedding Flowers</a></li>
+<li><a class="hover:text-accent transition-colors" href="#">Sympathy</a></li>
+<li><a class="hover:text-accent transition-colors" href="#">Birthday</a></li>
+<li><a class="hover:text-accent transition-colors" href="#">Special Events</a></li>
+</ul>
+</div>
+<div class="space-y-4">
+<h3 class="text-lg font-medium text-text-light dark:text-white">Stay in Bloom</h3>
+<p class="text-sm">Join our newsletter for fresh updates and special offers.</p>
+<form class="flex items-center">
+<label class="sr-only" for="email-address">Email address</label>
+<input autocomplete="email" class="flex-grow min-w-0 appearance-none rounded-l-md border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark px-4 py-2 text-sm placeholder-gray-500 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" id="email-address" name="email" placeholder="Enter your email" required="" type="email"/>
+<button class="inline-flex h-[42px] w-[42px] items-center justify-center rounded-r-md border border-transparent bg-accent px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2" type="submit">
+<span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+</form>
+<div class="flex space-x-4 pt-2">
+<a aria-label="Instagram" class="text-text-light/80 dark:text-text-dark/80 hover:text-accent transition-colors" href="#">
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+<path clip-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.024.06 1.378.06 3.808s-.012 2.784-.06 3.808c-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.024.048-1.378.06-3.808.06s-2.784-.012-3.808-.06c-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.048-1.024-.06-1.378-.06-3.808s.012-2.784.06-3.808c.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 016.08 2.525c.636-.247 1.363-.416 2.427-.465C9.53 2.013 9.884 2 12.315 2zM12 7.044a4.956 4.956 0 100 9.912 4.956 4.956 0 000-9.912zM12 15a3 3 0 110-6 3 3 0 010 6zm6.303-9.08a1.397 1.397 0 100-2.793 1.397 1.397 0 000 2.793z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a aria-label="Facebook" class="text-text-light/80 dark:text-text-dark/80 hover:text-accent transition-colors" href="#">
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a aria-label="Pinterest" class="text-text-light/80 dark:text-text-dark/80 hover:text-accent transition-colors" href="#">
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+<path clip-rule="evenodd" d="M12.012 2C6.484 2 2 6.484 2 12.012c0 4.354 2.872 8.054 6.837 9.44.025.13.04.26.04.393 0 .62-.153 1.22-.464 1.77-2.15 3.823 1.37 5.065 3.125 3.32C13.245 25.43 12 22.84 12 20.25c0-1.21.31-2.26.88-3.15-.36-.93-.65-2.22-.65-3.16 0-2.02.9-3.86 2.7-3.86 1.4 0 2.18.9 2.18 2.1 0 1.25-.82 3.1-.98 3.8-.18.78.38 1.4 1.13 1.4 1.4 0 2.45-1.9 2.45-4.2 0-2.2-1.5-3.8-3.9-3.8-2.9 0-4.8 2.2-4.8 4.6 0 .9.3 1.9.7 2.4-.14.5-.18.6-.32.6-.2 0-.37-.2-.37-.8 0-1.2.6-2.2.6-3.1 0-2.3-2-3-4-1-1.3 1.3-1 3.5.3 4.8 1 1 2.3 2.4 2.3 4.2 0 1.9-1.2 3.5-1.2 3.5-.5 1.5-3.3 1.2-3.3-1.2 0-2.6 1.8-5.3 1.8-5.3-.2-.5-1.8-7.5 1.2-7.5C10.412 2.612 12.412 4.112 12.412 6.612c0 2.6-1.5 4.6-3.8 4.6-1.2 0-1.9-.9-1.9-2.1 0-1.6 1.1-2.8 1.1-2.8.9-1 .4-2.2-.4-2.2-1.3 0-2.1 1-2.1 2.5 0 .9.3 1.5.3 1.5s-1.1 4.5-1.1 5.3c0 .3.1.5.1.5a6.58 6.58 0 00-.1 1.7c0 .5.1.9.1 1.4 0 .2.1.3.1.5.3.3.6.4.9.4.6 0 1.1-.3 1.4-.7.6-.8 1.1-2.2 1.1-2.2s.5 1 2.3 1c2.8 0 4.2-2.9 4.2-6.4 0-3.1-2.3-5.4-5.3-5.4-3.6 0-6.1 2.7-6.1 5.8 0 1.3.4 2.6 1.1 3.4L12.012 2z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+<div class="border-t border-border-light dark:border-border-dark pt-8 flex flex-col sm:flex-row justify-between items-center text-sm space-y-4 sm:space-y-0">
+<p class="text-text-light/80 dark:text-text-dark/80">© 2024 Fleur Boutique. All Rights Reserved.</p>
+<div class="flex items-center space-x-4">
+<a class="hover:text-accent transition-colors" href="#">Privacy Policy</a>
+<span class="text-gray-400">|</span>
+<a class="hover:text-accent transition-colors" href="#">Terms of Service</a>
+<span class="text-gray-400">|</span>
+<a class="hover:text-accent transition-colors" href="#">FAQ</a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+
+</body></html>

@@ -51,14 +51,22 @@ async def list_products(
     page: int = Query(1, ge=1),
     page_size: int = Query(12, ge=1, le=50),
     category: Optional[str] = None,  # slug
-    featured: Optional[bool] = None,
+    is_featured: Optional[bool] = None,
+    is_published: Optional[bool] = None,
     min_price: Optional[int] = None,
     max_price: Optional[int] = None,
     sort: str = Query("newest", regex="^(newest|price_asc|price_desc|popular)$"),
     db: Client = Depends(get_supabase)
 ):
     """List published products with filtering."""
-    query = db.table("products").select("*", count="exact").eq("is_published", True)
+    query = db.table("products").select("*", count="exact")
+    
+    # Only filter by is_published if explicitly set
+    if is_published is not None:
+        query = query.eq("is_published", is_published)
+    else:
+        # Default to showing only published products
+        query = query.eq("is_published", True)
     
     # Category filter (by slug)
     if category:
@@ -66,7 +74,7 @@ async def list_products(
         if cat.data:
             query = query.eq("category_id", cat.data[0]["id"])
     
-    if featured:
+    if is_featured:
         query = query.eq("is_featured", True)
     if min_price:
         query = query.gte("price", min_price)
@@ -226,13 +234,51 @@ async def search(
 # =====================================================
 # SOCIAL FEED
 # =====================================================
-@router.get("/social/feed", response_model=list[SocialFeedResponse])
+@router.get("/social/feed", response_model=PaginatedResponse)
 async def get_social_feed(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(12, ge=1, le=50),
+    platform: Optional[str] = None,
+    year: Optional[int] = None,
+    month: Optional[int] = Query(None, ge=1, le=12),
     db: Client = Depends(get_supabase)
 ):
-    """Get social feed items (Facebook/Instagram)."""
-    result = db.table("social_feed").select("*").order("posted_at", desc=True).execute()
-    return result.data
+    """Get social feed items (Facebook/Instagram) with pagination and date filtering."""
+    query = db.table("social_feed").select("*", count="exact")
+    
+    if platform:
+        query = query.eq("platform", platform)
+    
+    # Date filtering by year and month
+    if year and month:
+        # Filter posts within the specified month
+        from datetime import datetime
+        start_date = datetime(year, month, 1).isoformat()
+        if month == 12:
+            end_date = datetime(year + 1, 1, 1).isoformat()
+        else:
+            end_date = datetime(year, month + 1, 1).isoformat()
+        query = query.gte("posted_at", start_date).lt("posted_at", end_date)
+    elif year:
+        # Filter posts within the specified year
+        from datetime import datetime
+        start_date = datetime(year, 1, 1).isoformat()
+        end_date = datetime(year + 1, 1, 1).isoformat()
+        query = query.gte("posted_at", start_date).lt("posted_at", end_date)
+        
+    offset = (page - 1) * page_size
+    query = query.order("posted_at", desc=True).range(offset, offset + page_size - 1)
+    
+    result = query.execute()
+    total = result.count or 0
+    
+    return PaginatedResponse(
+        items=result.data,
+        total=total,
+        page=page,
+        page_size=page_size,
+        total_pages=(total + page_size - 1) // page_size
+    )
 
 
 @router.get("/social/feed/{post_id}", response_model=SocialFeedResponse)

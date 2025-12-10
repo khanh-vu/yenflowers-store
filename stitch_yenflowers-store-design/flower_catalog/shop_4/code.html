@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Flower Catalog with Filters</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        @layer theme {
+            :root {
+                --primary-color: #927549;--secondary-color: #f7f4ef;--text-primary: #3d3d3d;--text-secondary: #707070;--background-light: #ffffff;
+                --background-dark: #1f2a24;
+            }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "var(--primary-color)",
+                        "secondary": "var(--secondary-color)",
+                        "text-primary": "var(--text-primary)",
+                        "text-secondary": "var(--text-secondary)",
+                        "background-light": "var(--background-light)",
+                        "background-dark": "var(--background-dark)",
+                        "accent-gold": "#d4af37",
+                        "accent-terracotta": "#e07a5f"
+                    },
+                    fontFamily: {
+                        "display": ["Playfair Display", "serif"],
+                        "body": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-body text-text-primary dark:text-text-dark">
+<div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/10 px-4 sm:px-6 lg:px-10 py-4 bg-white/80 dark:bg-background-dark/80 backdrop-blur-sm sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2 text-text-light dark:text-text-dark">
+<img alt="Yên Flowers &amp; Events logo" class="h-10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7cFC5jtVAHW2WOc1oaq7PLJzzzltS_gpE-fBUMZNB23lBDQH7IvJsaWUkFVkwnZ5WyMUVw_wka5OHEDlE_03w8DNRSqDMMaFppQDLKjVg9a9kkD7unGIBqWtwCjGasGDSrNXow69mVWKHYQfbS8fLhTXn885MiziqcHPUxbxHSIyqNJlDVL1GcecLmaNGTrL892fxqSNyIPM9W9U76v-2E8ENLxHO7Ng1WV50RirHh8GDNeWX8QMOZfxbUVamPDkZq8bGkT3yfHVS"/>
+</div>
+</div>
+<nav class="hidden md:flex items-center gap-8 font-body">
+<a class="text-sm font-medium text-text-secondary hover:text-primary transition-colors" href="#">Home</a>
+<a class="text-sm font-semibold text-primary" href="#">Shop</a>
+<a class="text-sm font-medium text-text-secondary hover:text-primary transition-colors" href="#">About Us</a>
+<a class="text-sm font-medium text-text-secondary hover:text-primary transition-colors" href="#">Contact</a>
+</nav>
+<div class="flex items-center justify-end gap-1">
+<button class="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined !text-2xl text-text-secondary">search</span>
+</button>
+<button class="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined !text-2xl text-text-secondary">person</span>
+</button>
+<button class="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined !text-2xl text-text-secondary">shopping_bag</span>
+</button>
+</div>
+</header>
+<main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+<div class="text-center mb-8">
+<h1 class="font-display text-4xl md:text-5xl font-medium text-text-primary">Our Collections</h1>
+<p class="mt-4 text-base text-text-secondary max-w-2xl mx-auto">Discover our curated selection of fresh, artisanal flower arrangements for every occasion.</p>
+</div>
+<div class="mb-10 p-4 border-y border-primary/10">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-text-primary" for="filter-type">Flower Type</label>
+<select class="form-select text-sm rounded border-primary/20 focus:ring-primary focus:border-primary bg-background-light dark:bg-background-dark dark:border-primary/50" id="filter-type">
+<option>All Types</option>
+<option>Hoa Hồng (Roses)</option>
+<option>Hoa Lan (Orchids)</option>
+<option>Hoa Ly (Lilies)</option>
+<option>Bó Hoa Theo Mùa (Seasonal)</option>
+</select>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-text-primary" for="filter-occasion">Occasion</label>
+<select class="form-select text-sm rounded border-primary/20 focus:ring-primary focus:border-primary bg-background-light dark:bg-background-dark dark:border-primary/50" id="filter-occasion">
+<option>All Occasions</option>
+<option>Tình Yêu (Love)</option>
+<option>Chúc Mừng (Congratulations)</option>
+<option>Sinh Nhật (Birthday)</option>
+<option>Chia Buồn (Sympathy)</option>
+</select>
+</div>
+<div class="flex flex-col gap-2 col-span-1 md:col-span-2">
+<label class="text-sm font-semibold text-text-primary" for="filter-price">Price Range</label>
+<input class="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary" id="filter-price" max="5000000" min="100000" type="range" value="2500000"/>
+<div class="flex justify-between text-xs text-text-secondary mt-1">
+<span>100.000 VNĐ</span>
+<span>5.000.000 VNĐ</span>
+</div>
+</div>
+</div>
+</div>
+<div class="w-full">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+<div class="flex flex-wrap gap-2 text-sm text-text-secondary">
+<a class="hover:text-primary transition-colors" href="#">Home</a>
+<span>/</span>
+<span class="font-medium text-text-primary">Shop</span>
+</div>
+<div class="flex items-center gap-2">
+<label class="text-sm font-medium text-text-secondary" for="sort">Sort by:</label>
+<select class="form-select text-sm rounded border-primary/20 focus:ring-primary focus:border-primary bg-background-light dark:bg-background-dark dark:border-primary/50" id="sort">
+<option>Popularity</option>
+<option>Newest</option>
+<option>Price: Low to High</option>
+<option>Price: High to Low</option>
+</select>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
+<div class="group flex flex-col text-center">
+<div class="relative overflow-hidden">
+<img class="w-full aspect-[4/5] object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A bright bouquet of orange and yellow flowers named Saigon Sunrise" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMP8lTPPbV8XnI5C5PmW2N0aXkTixSu3Srm0BfBJ8fFq8e2pAyS6GhoyJ56Rwr-0Nabc_ghyxHYgwscl8ZhiZvbijxyQgrY3XiCr82rvg38NQQGTb5LLUTf4IPz2O9vKtMt6mb0sH6Tw8Ulbbi5w9ednMUErwdhWAjimg2Yww_nNE-OFUxD54usq4hsGhcLM3rsPKq_AkkMvoFE_WvaR9ZyJYwD0NSunwH510YHMhykPBXYDpDkR8pF2wV6jAKEsd_JNQyL4Vwm7kn"/>
+<div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<span class="absolute top-3 left-3 bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-1 rounded-full">Bestseller</span>
+<button class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 text-text-primary py-2 px-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bottom-6 text-sm font-semibold whitespace-nowrap">
+                                        Quick Add
+                                    </button>
+</div>
+<div class="pt-4">
+<h3 class="font-display text-xl">Saigon Sunrise</h3>
+<p class="text-primary font-medium mt-1">850.000 VNĐ</p>
+</div>
+</div>
+<div class="group flex flex-col text-center">
+<div class="relative overflow-hidden">
+<img class="w-full aspect-[4/5] object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A lush bouquet of pink and white roses in a garden setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9aczbIkavIB-22pB-RrZXHu-yZ9mKhd17dlkVakyHF8H4TrquQ2ORkF3qL3cR7833uEOumbOl87UAc8bDbu2wVHkpeObRUzHjNQBYoMJ_m6FB6tu4jX-KtY5L6eFuqT9woEf5_15RRiHhx6oa91VXrD9MxY-qJiQvxmMy2pYELME17xOCBSRx18tvoekgUIaFrXIPn4mw8W7CobzP_m6Zutkxezi_3ja8cyFATmM0Oxd8eVW2PeE4aN4HL8QkEPK5Qvl7uX2qllHs"/>
+<div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<button class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 text-text-primary py-2 px-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bottom-6 text-sm font-semibold whitespace-nowrap">
+                                        Quick Add
+                                    </button>
+</div>
+<div class="pt-4">
+<h3 class="font-display text-xl">Jardin de Roses</h3>
+<p class="text-primary font-medium mt-1">1.200.000 VNĐ</p>
+</div>
+</div>
+<div class="group flex flex-col text-center">
+<div class="relative overflow-hidden">
+<img class="w-full aspect-[4/5] object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A gentle pastel bouquet with spring flowers" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9r1wze69IWKNQ6knGyPYm5223dSpOHbF7NExOcsw-m4CDwJuLcp5PvSUuCc94bjKV36BcseObF-hBolA4vF606-L1yeWNM1zyAhf3E13NkLnB0pZ0hwwbiYtiDlN3EtOfZm24Ornqv3j8fGNQUtZV1KjGDSQ7TDOq6uyxoNIWJXAoLdudlFbqmwcPYoTpR_UcYYn-JkYc2mGJQoWZPAWtg1r9cEs2lppYJgaxe09cqck20GZ_YomLudexKPAxWdBuAqNNo5cRtzLu"/>
+<div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<span class="absolute top-3 left-3 bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-1 rounded-full">New Arrival</span>
+<button class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 text-text-primary py-2 px-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bottom-6 text-sm font-semibold whitespace-nowrap">
+                                        Quick Add
+                                    </button>
+</div>
+<div class="pt-4">
+<h3 class="font-display text-xl">Whispers of Spring</h3>
+<p class="text-primary font-medium mt-1">950.000 VNĐ</p>
+</div>
+</div>
+<div class="group flex flex-col text-center">
+<div class="relative overflow-hidden">
+<img class="w-full aspect-[4/5] object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A sophisticated bouquet of white lilies" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMUFyqkAkBUMh8ftrbx1lmsrjLT2L_WMVxa2J_39fPcOa0lwV4jVo7r_f7JtX4QDhOvOGror4d5oOwqTcAFy0WtTzwIWMNdOgQEujyoJ-LDkHimeiY1tXZOh142-oVlZ_mqpOY9uc2ScCj_yahXvpKd4qQUlaXsl3PxfLvPPXBLdUHWxvM8w7DEeohN1BxED6kyFGthFbmg_ViqNtfCrHIxDNPmEmAh6kDc3eApJe58VPzmZu7yXosxN0FYnEZL3m-utd1M2PSrBvY"/>
+<div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<button class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 text-text-primary py-2 px-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bottom-6 text-sm font-semibold whitespace-nowrap">
+                                        Quick Add
+                                    </button>
+</div>
+<div class="pt-4">
+<h3 class="font-display text-xl">Ivory Elegance</h3>
+<p class="text-primary font-medium mt-1">1.500.000 VNĐ</p>
+</div>
+</div>
+<div class="group flex flex-col text-center">
+<div class="relative overflow-hidden">
+<img class="w-full aspect-[4/5] object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A vibrant mix of colorful wildflowers" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAG1sILJwGA8R_ZsNG6H4_excUMs3V5SAvhjZ-a-_CsCuERSXiGMDHoofEyE6myuUekK07rpgXvYf0_zWD1uB-zHrBQakwIdlxGIr7G9gwTN3bdhcxjt3bLIo6no0k9fikBev2P4KFFCrfg8pJ0AmNmcKlefEOB6GZCSYUdmI44p9SCMe5nDfF3kTCj9bMOfmL0nHq7VZZkNMXu9cRjKL0Zvs8Ww4GIOZCsDUdQAlqtf1qBjv7_RQhUKrweIbcJL_qxdpXdKQMUmOlz"/>
+<div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<button class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 text-text-primary py-2 px-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bottom-6 text-sm font-semibold whitespace-nowrap">
+                                        Quick Add
+                                    </button>
+</div>
+<div class="pt-4">
+<h3 class="font-display text-xl">Mekong Meadow</h3>
+<p class="text-primary font-medium mt-1">750.000 VNĐ</p>
+</div>
+</div>
+<div class="group flex flex-col text-center">
+<div class="relative overflow-hidden">
+<img class="w-full aspect-[4/5] object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A romantic bouquet of deep red roses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbcm48Pl9IJ-q_w04NSTdJIu7dEo8S71YXgTblwNNyq5onv52zVQ7_FH4GvoRRk0bXwDgzTewAo3yHg4sbrrLblCiJ-IuRVG_WMSqA_SsfEy3SWQC-KjgRc0t3rmYLx1mUxRWe5-Jbmca9Qt9mhaF1e5ihbG_zx1Zf8j6fxWY6iJfwQLE7s2iZQ_RxulTwxryHb9wvEAFvhJeC6vNBVCAnOpo5PtuITlXwZms97T6GFZWgFNmjzj866mcM601RSfSgovk_CHtpU1bp"/>
+<div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<button class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 text-text-primary py-2 px-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bottom-6 text-sm font-semibold whitespace-nowrap">
+                                        Quick Add
+                                    </button>
+</div>
+<div class="pt-4">
+<h3 class="font-display text-xl">Eternal Passion</h3>
+<p class="text-primary font-medium mt-1">1.800.000 VNĐ</p>
+</div>
+</div>
+<div class="group flex flex-col text-center">
+<div class="relative overflow-hidden">
+<img class="w-full aspect-[4/5] object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Another sophisticated bouquet of white lilies" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMUFyqkAkBUMh8ftrbx1lmsrjLT2L_WMVxa2J_39fPcOa0lwV4jVo7r_f7JtX4QDhOvOGror4d5oOwqTcAFy0WtTzwIWMNdOgQEujyoJ-LDkHimeiY1tXZOh142-oVlZ_mqpOY9uc2ScCj_yahXvpKd4qQUlaXsl3PxfLvPPXBLdUHWxvM8w7DEeohN1BxED6kyFGthFbmg_ViqNtfCrHIxDNPmEmAh6kDc3eApJe58VPzmZu7yXosxN0FYnEZL3m-utd1M2PSrBvY"/>
+<div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<button class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 text-text-primary py-2 px-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bottom-6 text-sm font-semibold whitespace-nowrap">
+                                        Quick Add
+                                    </button>
+</div>
+<div class="pt-4">
+<h3 class="font-display text-xl">Hanoi Dream</h3>
+<p class="text-primary font-medium mt-1">1.350.000 VNĐ</p>
+</div>
+</div>
+<div class="group flex flex-col text-center">
+<div class="relative overflow-hidden">
+<img class="w-full aspect-[4/5] object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Another bright bouquet of orange and yellow flowers" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMP8lTPPbV8XnI5C5PmW2N0aXkTixSu3Srm0BfBJ8fFq8e2pAyS6GhoyJ56Rwr-0Nabc_ghyxHYgwscl8ZhiZvbijxyQgrY3XiCr82rvg38NQQGTb5LLUTf4IPz2O9vKtMt6mb0sH6Tw8Ulbbi5w9ednMUErwdhWAjimg2Yww_nNE-OFUxD54usq4hsGhcLM3rsPKq_AkkMvoFE_WvaR9ZyJYwD0NSunwH510YHMhykPBXYDpDkR8pF2wV6jAKEsd_JNQyL4Vwm7kn"/>
+<div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<button class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 text-text-primary py-2 px-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bottom-6 text-sm font-semibold whitespace-nowrap">
+                                        Quick Add
+                                    </button>
+</div>
+<div class="pt-4">
+<h3 class="font-display text-xl">Golden Hour</h3>
+<p class="text-primary font-medium mt-1">900.000 VNĐ</p>
+</div>
+</div>
+</div>
+<nav class="flex items-center justify-center pt-12 mt-8 border-t border-primary/10">
+<ul class="flex items-center -space-x-px h-10 text-sm">
+<li>
+<a class="flex items-center justify-center px-3 h-9 ms-0 leading-tight text-text-secondary dark:text-text-dark/60 bg-white dark:bg-background-dark border border-primary/10 rounded-s-md hover:bg-secondary hover:text-text-primary" href="#">
+<span class="material-symbols-outlined !text-xl">chevron_left</span>
+</a>
+</li>
+<li>
+<a aria-current="page" class="flex items-center justify-center px-4 h-9 font-semibold text-white dark:text-background-dark bg-primary border border-primary/20" href="#">1</a>
+</li>
+<li>
+<a class="flex items-center justify-center px-4 h-9 leading-tight text-text-secondary dark:text-text-dark/60 bg-white dark:bg-background-dark border border-primary/10 hover:bg-secondary hover:text-text-primary" href="#">2</a>
+</li>
+<li>
+<a class="flex items-center justify-center px-4 h-9 leading-tight text-text-secondary dark:text-text-dark/60 bg-white dark:bg-background-dark border border-primary/10 hover:bg-secondary hover:text-text-primary" href="#">3</a>
+</li>
+<li>
+<a class="flex items-center justify-center px-3 h-9 leading-tight text-text-secondary dark:text-text-dark/60 bg-white dark:bg-background-dark border border-primary/10 rounded-e-md hover:bg-secondary hover:text-text-primary" href="#">
+<span class="material-symbols-outlined !text-xl">chevron_right</span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</main>
+<footer class="w-full bg-secondary dark:bg-background-dark/50 mt-16 border-t border-primary/10">
+<div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+<div class="col-span-2 lg:col-span-2">
+<img alt="Yên Flowers &amp; Events logo" class="h-12 mb-4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiKfakDpi00RW3rAjjEqSMlkexSf4RlfDTTuCfAuTscn_aRiScUVgqX3ySklwBccSd-JqDVmICPEaD8lX8Dhr1O5Eaiiurb08X1Dt9ErMK6294nPYV5f9u1HBy0o7gqIKyboo9egN34Pwj1PEQOJAPlwifI2C04m3t7brfn73LGhJPA_GbX7EADDFFQ4QIkXVWbn4fkyp5mY__wM4M798TK_Ywr-9J7VBPQcrosv8EuudeHCbyCiCQisEFGuB4kLFnxsKtfZ8yZd4u"/>
+<p class="text-sm text-text-secondary">Handcrafted bouquets for every moment, delivered with love in Ho Chi Minh City.</p>
+</div>
+<div>
+<h4 class="font-bold tracking-wider uppercase text-sm mb-4 text-text-primary">Shop</h4>
+<nav class="flex flex-col gap-2 text-sm text-text-secondary">
+<a class="hover:text-primary transition-colors" href="#">All Collections</a>
+<a class="hover:text-primary transition-colors" href="#">Seasonal Flowers</a>
+<a class="hover:text-primary transition-colors" href="#">For Business</a>
+<a class="hover:text-primary transition-colors" href="#">Gift Cards</a>
+</nav>
+</div>
+<div>
+<h4 class="font-bold tracking-wider uppercase text-sm mb-4 text-text-primary">Customer Service</h4>
+<nav class="flex flex-col gap-2 text-sm text-text-secondary">
+<a class="hover:text-primary transition-colors" href="#">Contact Us</a>
+<a class="hover:text-primary transition-colors" href="#">Delivery Information</a>
+<a class="hover:text-primary transition-colors" href="#">FAQs</a>
+<a class="hover:text-primary transition-colors" href="#">Return Policy</a>
+</nav>
+</div>
+<div>
+<h4 class="font-bold tracking-wider uppercase text-sm mb-4 text-text-primary">Follow Us</h4>
+<div class="flex gap-4">
+<a class="text-text-secondary hover:text-primary transition-colors" href="#">
+<svg aria-hidden="true" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-text-secondary hover:text-primary transition-colors" href="#">
+<svg aria-hidden="true" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+<path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.584.069-4.85c.149-3.225 1.664 4.771 4.919-4.919 1.266-.057 1.644-.069 4.85-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12s.014 3.667.072 4.947c.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24s3.667-.014 4.947-.072c4.358-.2 6.78-2.618 6.98-6.98C23.986 15.667 24 15.259 24 12s-.014-3.667-.072-4.947c-.2-4.358-2.618-6.78-6.98-6.98C15.667.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+<div class="border-t border-primary/10">
+<div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-xs text-text-secondary">
+                        © 2024 Yên Flowers &amp; Events. All Rights Reserved.
+                    </div>
+</div>
+</footer>
+</div>
+</div>
+</body></html>

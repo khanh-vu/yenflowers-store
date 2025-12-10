@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FAQ Page - Fleur Boutique</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                        "heading-color": "#0A5C36",
+                        "text-color": "#111813",
+                        "subtle-text": "#61896f"
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-color dark:text-gray-200">
+<div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex w-full items-center justify-center border-b border-solid border-b-[#f0f4f2] dark:border-b-gray-800">
+<div class="flex max-w-7xl flex-1 items-center justify-between px-10 py-3">
+<div class="flex items-center gap-4 text-heading-color">
+<div class="size-6">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M44 4H30.6666V17.3334H17.3334V30.6666H4V44H44V4Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-heading-color text-lg font-bold leading-tight tracking-[-0.015em]">Fleur Boutique</h2>
+</div>
+<div class="hidden flex-1 justify-end gap-8 md:flex">
+<div class="flex items-center gap-9">
+<a class="text-text-color dark:text-gray-300 text-sm font-medium leading-normal" href="#">Shop</a>
+<a class="text-text-color dark:text-gray-300 text-sm font-medium leading-normal" href="#">About Us</a>
+<a class="text-text-color dark:text-gray-300 text-sm font-medium leading-normal" href="#">Contact</a>
+<a class="text-heading-color dark:text-primary text-sm font-bold leading-normal" href="#">FAQ</a>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-primary text-text-color text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">Cart</span>
+</button>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-[#f0f4f2] dark:bg-gray-800/50 text-text-color dark:text-gray-300 gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+<span class="material-symbols-outlined text-xl">person</span>
+</button>
+</div>
+</div>
+</div>
+</header>
+<main class="flex flex-1 justify-center py-10 sm:py-16 md:py-20">
+<div class="flex w-full max-w-3xl flex-col gap-8 px-4">
+<!-- Page Heading -->
+<div class="flex flex-wrap justify-center gap-3 text-center">
+<div class="flex w-full flex-col gap-3">
+<p class="text-heading-color dark:text-primary text-4xl font-black leading-tight tracking-[-0.033em] sm:text-5xl">Frequently Asked Questions</p>
+<p class="text-subtle-text dark:text-gray-400 text-base font-normal leading-normal">Find answers to common questions about ordering, delivery, and flower care.</p>
+</div>
+</div>
+<!-- Search Bar -->
+<div class="px-4 py-3">
+<label class="flex flex-col min-w-40 h-14 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full shadow-sm">
+<div class="text-subtle-text flex border-none bg-white dark:bg-background-dark items-center justify-center pl-4 rounded-l-xl border-r-0">
+<span class="material-symbols-outlined text-2xl">search</span>
+</div>
+<input class="form-input w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-xl text-text-color dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 border-none bg-white dark:bg-background-dark h-full placeholder:text-subtle-text px-4 pl-2 text-base font-normal leading-normal" placeholder="What can we help you with?" value=""/>
+</div>
+</label>
+</div>
+<!-- Chips -->
+<div class="flex justify-center gap-2 p-3 flex-wrap">
+<div class="flex h-8 cursor-pointer items-center justify-center gap-x-2 rounded-lg bg-primary/20 dark:bg-primary/30 px-4 text-heading-color dark:text-primary font-bold">
+<p class="text-sm leading-normal">Ordering &amp; Payments</p>
+</div>
+<div class="flex h-8 cursor-pointer items-center justify-center gap-x-2 rounded-lg bg-[#f0f4f2] dark:bg-gray-800/50 px-4 hover:bg-gray-200 dark:hover:bg-gray-800">
+<p class="text-text-color dark:text-gray-300 text-sm font-medium leading-normal">Delivery</p>
+</div>
+<div class="flex h-8 cursor-pointer items-center justify-center gap-x-2 rounded-lg bg-[#f0f4f2] dark:bg-gray-800/50 px-4 hover:bg-gray-200 dark:hover:bg-gray-800">
+<p class="text-text-color dark:text-gray-300 text-sm font-medium leading-normal">Flower &amp; Plant Care</p>
+</div>
+<div class="flex h-8 cursor-pointer items-center justify-center gap-x-2 rounded-lg bg-[#f0f4f2] dark:bg-gray-800/50 px-4 hover:bg-gray-200 dark:hover:bg-gray-800">
+<p class="text-text-color dark:text-gray-300 text-sm font-medium leading-normal">Our Products &amp; Services</p>
+</div>
+</div>
+<!-- Accordions -->
+<div class="flex flex-col p-4">
+<details class="flex flex-col border-t border-t-[#dbe6df] dark:border-t-gray-800 py-2 group" open="">
+<summary class="flex cursor-pointer list-none items-center justify-between gap-6 py-4">
+<p class="text-text-color dark:text-gray-200 text-base font-medium leading-normal">How do I place an order online?</p>
+<div class="text-text-color dark:text-gray-300 transition-transform duration-300 group-open:rotate-180">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</summary>
+<p class="text-subtle-text dark:text-gray-400 text-sm font-normal leading-relaxed pb-2 pr-8">To place an order, simply browse our collection, select the bouquet you love, add it to your cart, and proceed to checkout. You will be guided through the payment and delivery information steps.</p>
+</details>
+<details class="flex flex-col border-t border-t-[#dbe6df] dark:border-t-gray-800 py-2 group">
+<summary class="flex cursor-pointer list-none items-center justify-between gap-6 py-4">
+<p class="text-text-color dark:text-gray-200 text-base font-medium leading-normal">What areas in Ho Chi Minh City do you deliver to?</p>
+<div class="text-text-color dark:text-gray-300 transition-transform duration-300 group-open:rotate-180">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</summary>
+<p class="text-subtle-text dark:text-gray-400 text-sm font-normal leading-relaxed pb-2 pr-8">We deliver to all districts within Ho Chi Minh City. Delivery fees may vary based on the distance from our store. Please check our delivery policy page for detailed information on zones and charges.</p>
+</details>
+<details class="flex flex-col border-t border-t-[#dbe6df] dark:border-t-gray-800 py-2 group">
+<summary class="flex cursor-pointer list-none items-center justify-between gap-6 py-4">
+<p class="text-text-color dark:text-gray-200 text-base font-medium leading-normal">How can I keep my flowers fresh for longer?</p>
+<div class="text-text-color dark:text-gray-300 transition-transform duration-300 group-open:rotate-180">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</summary>
+<p class="text-subtle-text dark:text-gray-400 text-sm font-normal leading-relaxed pb-2 pr-8">To maximize the lifespan of your flowers, trim the stems at an angle before placing them in a clean vase with fresh water. Keep them away from direct sunlight and heat. Change the water every two days for best results.</p>
+</details>
+<details class="flex flex-col border-t border-t-[#dbe6df] dark:border-t-gray-800 py-2 group">
+<summary class="flex cursor-pointer list-none items-center justify-between gap-6 py-4">
+<p class="text-text-color dark:text-gray-200 text-base font-medium leading-normal">Do you offer custom bouquet arrangements?</p>
+<div class="text-text-color dark:text-gray-300 transition-transform duration-300 group-open:rotate-180">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</summary>
+<p class="text-subtle-text dark:text-gray-400 text-sm font-normal leading-relaxed pb-2 pr-8">Absolutely! We love creating unique arrangements. Please contact us directly via our 'Contact' page or phone number to discuss your specific needs, preferred flowers, and color palette with our florists.</p>
+</details>
+<div class="border-b border-b-[#dbe6df] dark:border-b-gray-800"></div>
+</div>
+<!-- CTA -->
+<div class="mt-8 flex flex-col items-center justify-center gap-4 rounded-xl bg-white dark:bg-background-dark p-8 text-center shadow-sm">
+<h3 class="text-2xl font-bold text-heading-color dark:text-primary">Still have questions?</h3>
+<p class="max-w-md text-subtle-text dark:text-gray-400">Can't find the answer you're looking for? Our team is happy to help you with any inquiries.</p>
+<button class="mt-2 flex min-w-[120px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-6 bg-primary text-text-color text-base font-bold leading-normal tracking-[0.015em]">Contact Us</button>
+</div>
+</div>
+</main>
+</div>
+</div>
+</body></html>
